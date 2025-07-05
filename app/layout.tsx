@@ -117,12 +117,19 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="id" className="light">
+    <html lang="id" className="light" style={{ colorScheme: "light" }}>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">{children}</main>
+        <ThemeProvider 
+          attribute="class" 
+          defaultTheme="light" 
+          enableSystem 
+          disableTransitionOnChange
+        >
+          <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+            {children}
+          </main>
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
