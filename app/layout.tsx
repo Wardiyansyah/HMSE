@@ -63,19 +63,21 @@ const menuItems = [
 function AppSidebar() {
   return (
     <Sidebar>
-      <SidebarHeader>
-        <div className="flex items-center space-x-2 px-2 py-2">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
-            <Brain className="h-5 w-5 text-white" />
+      <Link href="/">
+        <SidebarHeader>
+          <div className="flex items-center space-x-2 px-2 py-2">
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
+              <Brain className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                EduGenAI
+              </h2>
+              <p className="text-xs text-gray-600">AI Education Platform</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              EduGenAI
-            </h2>
-            <p className="text-xs text-gray-600">AI Education Platform</p>
-          </div>
-        </div>
-      </SidebarHeader>
+        </SidebarHeader>
+      </Link>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Menu Utama</SidebarGroupLabel>

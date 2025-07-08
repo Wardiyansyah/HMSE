@@ -33,7 +33,7 @@ import {
 const menuItems = [
   {
     title: "Dashboard",
-    url: "/",
+    url: "/dashboard",
     icon: Home,
     description: "Halaman utama dan overview",
   },

@@ -122,7 +122,7 @@ const OPENAI_API_KEY =
 
 const openai = (modelName: string) =>
   openaiBase({
-    model: modelName,
+    model: 'gpt-3.5-turbo',
     // only pass apiKey if we actually have one
     ...(OPENAI_API_KEY ? { apiKey: OPENAI_API_KEY } : {}),
   })
