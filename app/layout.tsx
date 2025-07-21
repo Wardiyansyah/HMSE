@@ -2,7 +2,8 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/lib/theme-context"
+import { LanguageProvider } from "@/lib/language-context"
 import {
   Sidebar,
   SidebarContent,
@@ -63,21 +64,19 @@ const menuItems = [
 function AppSidebar() {
   return (
     <Sidebar>
-      <Link href="/">
-        <SidebarHeader>
-          <div className="flex items-center space-x-2 px-2 py-2">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
-              <Brain className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                EduGenAI
-              </h2>
-              <p className="text-xs text-gray-600">AI Education Platform</p>
-            </div>
+      <SidebarHeader>
+        <div className="flex items-center space-x-2 px-2 py-2">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
+            <Brain className="h-5 w-5 text-white" />
           </div>
-        </SidebarHeader>
-      </Link>
+          <div>
+            <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              EduGenAI
+            </h2>
+            <p className="text-xs text-gray-600">AI Education Platform</p>
+          </div>
+        </div>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Menu Utama</SidebarGroupLabel>
@@ -119,19 +118,16 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="id" className="light" style={{ colorScheme: "light" }}>
+    <html lang="id">
       <body className={inter.className}>
-        <ThemeProvider 
-          attribute="class" 
-          defaultTheme="light" 
-          enableSystem 
-          disableTransitionOnChange
-        >
-          <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-            {children}
-          </main>
+        <ThemeProvider>
+          <LanguageProvider>
+            <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-950 dark:to-black transition-colors duration-300">
+              {children}
+            </main>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>
-  );
+  )
 }
