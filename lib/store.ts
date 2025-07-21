@@ -10,8 +10,8 @@ interface User {
   role: "student" | "teacher" | "professional"
   avatar?: string
   preferences: {
-    language: string
-    theme: string
+    language: "id" | "en"
+    theme: "light" | "dark" | "system"
     notifications: boolean
     aiAssistance: boolean
   }
