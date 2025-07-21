@@ -13,7 +13,22 @@ import { NavigationHeader } from "@/components/navigation-header"
 import { streamText } from "ai"
 import { openai as openaiBase } from "@ai-sdk/openai"
 import { Label } from "@/components/ui/label"
-import { RefreshCw } from "lucide-react"
+import { RefreshCw, Send } from "lucide-react"
+import {
+  Sparkles,
+  Brain,
+  ChevronDown,
+  ChevronUp,
+  Lightbulb,
+  BookOpen,
+  Calculator,
+  Beaker,
+  Globe,
+  History,
+  User,
+  ImageIcon,
+  FileText,
+} from "lucide-react"
 
 function ApiKeySetup({ onClose }: { onClose: () => void }) {
   const [tempApiKey, setTempApiKey] = useState("")
@@ -24,14 +39,12 @@ function ApiKeySetup({ onClose }: { onClose: () => void }) {
 
     setIsValidating(true)
     try {
-      // Simple validation - check if key format is correct
       if (tempApiKey.startsWith("sk-") && tempApiKey.length > 20) {
-        // Store in sessionStorage for this session only
         sessionStorage.setItem("temp_openai_key", tempApiKey)
         onClose()
         window.location.reload()
       } else {
-        alert('Format API key tidak valid. Pastikan dimulai dengan "sk-" dan memiliki panjang yang sesuai.')
+        alert("Format API key tidak valid. Pastikan dimulai dengan 'sk-' dan memiliki panjang yang sesuai.")
       }
     } catch (error) {
       alert("Terjadi kesalahan saat memvalidasi API key.")
@@ -45,14 +58,14 @@ function ApiKeySetup({ onClose }: { onClose: () => void }) {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Brain className="h-5 w-5 text-blue-600" />
-            <span>Setup OpenAI API Key</span>
+            <span>Setup API Key</span>
           </CardTitle>
-          <CardDescription>Untuk menggunakan AI Tutor, Anda perlu menambahkan OpenAI API Key</CardDescription>
+          <CardDescription>Masukkan OpenAI API Key untuk mengaktifkan AI Tutor</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <h4 className="font-semibold text-blue-800 mb-2">📋 Cara Mendapatkan API Key:</h4>
-            <ol className="text-sm text-blue-700 space-y-1 list-decimal list-inside">
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-700">
+            <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">📋 Cara mendapatkan API Key:</h4>
+            <ol className="text-sm text-blue-700 dark:text-blue-400 space-y-1 list-decimal list-inside">
               <li>
                 Kunjungi{" "}
                 <a
@@ -66,8 +79,8 @@ function ApiKeySetup({ onClose }: { onClose: () => void }) {
               </li>
               <li>Login atau daftar akun OpenAI</li>
               <li>Klik "Create new secret key"</li>
-              <li>Copy API key yang dihasilkan</li>
-              <li>Paste di form di bawah ini</li>
+              <li>Salin API key yang dibuat</li>
+              <li>Paste di kolom di bawah ini</li>
             </ol>
           </div>
 
@@ -81,14 +94,18 @@ function ApiKeySetup({ onClose }: { onClose: () => void }) {
               onChange={(e) => setTempApiKey(e.target.value)}
               className="font-mono text-sm"
             />
-            <p className="text-xs text-gray-600">API key akan disimpan sementara untuk sesi ini saja</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              API key hanya disimpan sementara di browser untuk sesi ini
+            </p>
           </div>
 
-          <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-            <h4 className="font-semibold text-yellow-800 mb-1">⚠️ Untuk Production:</h4>
-            <p className="text-sm text-yellow-700">
-              Tambahkan <code className="bg-yellow-100 px-1 rounded">NEXT_PUBLIC_OPENAI_API_KEY</code> di file{" "}
-              <code className="bg-yellow-100 px-1 rounded">.env.local</code> atau Environment Variables
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg border border-yellow-200 dark:border-yellow-700">
+            <h4 className="font-semibold text-yellow-800 dark:text-yellow-300 mb-1">⚠️ Untuk production:</h4>
+            <p className="text-sm text-yellow-700 dark:text-yellow-400">
+              Tambahkan environment variable{" "}
+              <code className="bg-yellow-100 dark:bg-yellow-900/30 px-1 rounded">NEXT_PUBLIC_OPENAI_API_KEY</code> di
+              file <code className="bg-yellow-100 dark:bg-yellow-900/30 px-1 rounded">.env.local</code> atau environment
+              variables Vercel
             </p>
           </div>
 
@@ -107,7 +124,7 @@ function ApiKeySetup({ onClose }: { onClose: () => void }) {
               )}
             </Button>
             <Button variant="outline" onClick={onClose}>
-              Nanti Saja
+              Nanti
             </Button>
           </div>
         </CardContent>
@@ -122,28 +139,9 @@ const OPENAI_API_KEY =
 
 const openai = (modelName: string) =>
   openaiBase({
-    model: 'gpt-3.5-turbo',
-    // only pass apiKey if we actually have one
+    model: modelName,
     ...(OPENAI_API_KEY ? { apiKey: OPENAI_API_KEY } : {}),
   })
-
-import {
-  Send,
-  User,
-  Lightbulb,
-  BookOpen,
-  Calculator,
-  Beaker,
-  Globe,
-  History,
-  Mic,
-  ImageIcon,
-  FileText,
-  Sparkles,
-  Brain,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react"
 
 interface Message {
   id: string
@@ -159,18 +157,7 @@ export default function VirtualTutor() {
     {
       id: "1",
       type: "ai",
-      content: `Halo ${user?.name || "Siswa"}! 👋 
-
-Saya adalah AI Tutor EduGenAI, asisten pembelajaran cerdas yang siap membantu Anda 24/7. Saya menggunakan teknologi machine learning terdepan untuk memberikan penjelasan yang personal dan mudah dipahami.
-
-**Apa yang bisa saya bantu hari ini?**
-- 📚 Penjelasan konsep dengan contoh praktis
-- 🧮 Pemecahan soal matematika step-by-step  
-- 🔬 Eksperimen sains virtual
-- 📝 Bantuan mengerjakan PR
-- 🎯 Tips belajar yang efektif
-
-Silakan tanya apa saja yang ingin Anda pelajari!`,
+      content: `Halo ${user?.name || "Siswa"}! 👋 Saya AI Tutor EduGenAI, siap membantu Anda belajar dengan cara yang menyenangkan dan efektif!\n\n🎯 Saya bisa membantu Anda dengan:\n• Penjelasan konsep dari berbagai mata pelajaran\n• Pemecahan soal step-by-step\n• Tips dan strategi belajar\n• Persiapan ujian dan tugas\n\nSilakan ajukan pertanyaan atau pilih topik dari menu di samping. Mari kita mulai belajar! 🚀`,
       timestamp: new Date(),
     },
   ])
@@ -182,12 +169,36 @@ Silakan tanya apa saja yang ingin Anda pelajari!`,
   const [showApiKeySetup, setShowApiKeySetup] = useState(!OPENAI_API_KEY)
 
   const quickQuestions = [
-    { icon: <Calculator className="h-4 w-4" />, text: "Jelaskan hukum Newton dengan contoh", subject: "Fisika" },
-    { icon: <Beaker className="h-4 w-4" />, text: "Bagaimana proses fotosintesis terjadi?", subject: "Biologi" },
-    { icon: <Globe className="h-4 w-4" />, text: "Apa penyebab pemanasan global?", subject: "Geografi" },
-    { icon: <History className="h-4 w-4" />, text: "Ceritakan tentang kemerdekaan Indonesia", subject: "Sejarah" },
-    { icon: <Calculator className="h-4 w-4" />, text: "Cara menyelesaikan persamaan kuadrat", subject: "Matematika" },
-    { icon: <BookOpen className="h-4 w-4" />, text: "Analisis puisi 'Aku' karya Chairil Anwar", subject: "Bahasa" },
+    {
+      icon: <Calculator className="h-4 w-4" />,
+      text: "Jelaskan hukum Newton",
+      subject: "Fisika",
+    },
+    {
+      icon: <Beaker className="h-4 w-4" />,
+      text: "Proses fotosintesis",
+      subject: "Biologi",
+    },
+    {
+      icon: <Globe className="h-4 w-4" />,
+      text: "Penyebab pemanasan global",
+      subject: "Geografi",
+    },
+    {
+      icon: <History className="h-4 w-4" />,
+      text: "Kemerdekaan Indonesia",
+      subject: "Sejarah",
+    },
+    {
+      icon: <Calculator className="h-4 w-4" />,
+      text: "Persamaan kuadrat",
+      subject: "Matematika",
+    },
+    {
+      icon: <BookOpen className="h-4 w-4" />,
+      text: "Analisis puisi Chairil Anwar",
+      subject: "Bahasa",
+    },
   ]
 
   useEffect(() => {
@@ -197,7 +208,10 @@ Silakan tanya apa saja yang ingin Anda pelajari!`,
 
   useEffect(() => {
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
+      const scrollElement = scrollAreaRef.current.querySelector("[data-radix-scroll-area-viewport]")
+      if (scrollElement) {
+        scrollElement.scrollTop = scrollElement.scrollHeight
+      }
     }
   }, [messages])
 
@@ -232,7 +246,7 @@ Silakan tanya apa saja yang ingin Anda pelajari!`,
           msg.id === aiMessageId
             ? {
                 ...msg,
-                content: "⚠️ API key belum disetel. Silakan setup API key terlebih dahulu.",
+                content: "⚠️ API key belum disetel. Silakan setup API key terlebih dahulu untuk menggunakan AI Tutor.",
                 isStreaming: false,
               }
             : msg,
@@ -274,9 +288,15 @@ MATA PELAJARAN YANG DIKUASAI:
 - Geografi: Fisik dan Sosial
 - Dan mata pelajaran lainnya
 
-Selalu akhiri dengan pertanyaan atau ajakan untuk bertanya lebih lanjut.`,
+FORMAT JAWABAN:
+- Gunakan struktur yang jelas dengan heading dan bullet points
+- Berikan contoh nyata dan mudah dipahami
+- Sertakan tips praktis untuk mengingat materi
+- Akhiri dengan pertanyaan atau ajakan untuk bertanya lebih lanjut
+
+Selalu berikan jawaban yang komprehensif namun mudah dipahami sesuai level siswa.`,
         prompt: content,
-        maxTokens: 1000,
+        maxTokens: 1500,
       })
 
       let fullResponse = ""
@@ -290,15 +310,21 @@ Selalu akhiri dengan pertanyaan atau ajakan untuk bertanya lebih lanjut.`,
     } catch (error) {
       console.error("Error generating AI response:", error)
 
-      const fallbackResponse = `Maaf, saya mengalami sedikit gangguan teknis. Namun saya tetap bisa membantu Anda! 
+      const fallbackResponse = `Maaf, saya mengalami kesulitan teknis saat memproses pertanyaan "${content}". 
 
-Untuk pertanyaan "${content}", saya sarankan:
+Namun, saya tetap bisa membantu Anda! Berikut beberapa saran:
 
-1. **Coba pecah pertanyaan** menjadi bagian-bagian kecil
-2. **Cari kata kunci utama** dari topik yang ingin dipelajari  
-3. **Hubungkan dengan konsep** yang sudah Anda pahami sebelumnya
+🔧 **Solusi Teknis:**
+- Pastikan koneksi internet stabil
+- Coba refresh halaman dan ulangi pertanyaan
+- Periksa apakah API key sudah dikonfigurasi dengan benar
 
-Silakan coba tanya lagi dengan cara yang berbeda, atau pilih salah satu pertanyaan cepat. Saya siap membantu! 😊`
+💡 **Alternatif Bantuan:**
+- Coba ajukan pertanyaan dengan kata-kata yang lebih sederhana
+- Gunakan fitur Content Generator untuk materi pembelajaran
+- Bergabung dengan komunitas untuk diskusi dengan sesama pelajar
+
+Silakan coba lagi atau ajukan pertanyaan lain. Saya siap membantu! 😊`
 
       setMessages((prev) =>
         prev.map((msg) => (msg.id === aiMessageId ? { ...msg, content: fallbackResponse, isStreaming: false } : msg)),
@@ -309,28 +335,31 @@ Silakan coba tanya lagi dengan cara yang berbeda, atau pilih salah satu pertanya
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-950 dark:to-black">
       <NavigationHeader />
       {showApiKeySetup && <ApiKeySetup onClose={() => setShowApiKeySetup(false)} />}
 
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 flex items-center">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center">
             <Brain className="h-6 w-6 md:h-8 md:w-8 mr-2 md:mr-3 text-blue-600" />
-            Virtual Tutor AI
+            Virtual AI Tutor
           </h1>
-          <p className="text-sm md:text-base text-gray-600">
-            Asisten pembelajaran AI dengan teknologi machine learning terdepan
+          <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">
+            Asisten pembelajaran AI yang siap membantu Anda 24/7 dengan penjelasan yang mudah dipahami
           </p>
-          <div className="flex items-center space-x-2 mt-2">
-            <Badge variant="secondary" className="bg-green-100 text-green-800">
+          <div className="flex flex-wrap items-center gap-2 mt-3">
+            <Badge variant="secondary" className="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300">
               <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-              AI Online
+              Online
             </Badge>
-            <Badge variant="outline">Powered by GPT-4</Badge>
+            <Badge variant="outline">Powered by OpenAI GPT-4</Badge>
             <Badge variant="outline" className="hidden sm:inline-flex">
               Machine Learning
+            </Badge>
+            <Badge variant="outline" className="hidden md:inline-flex">
+              Bahasa Indonesia
             </Badge>
           </div>
         </div>
@@ -339,10 +368,10 @@ Silakan coba tanya lagi dengan cara yang berbeda, atau pilih salah satu pertanya
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Chat Interface - Full width on mobile, 3/4 on desktop */}
           <div className="lg:col-span-3">
-            <Card className="h-[600px] md:h-[700px] flex flex-col">
-              <CardHeader className="border-b bg-gradient-to-r from-blue-50 to-indigo-50 p-4">
+            <Card className="h-[600px] md:h-[700px] flex flex-col overflow-hidden">
+              <CardHeader className="border-b dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 flex-shrink-0">
                 <div className="flex items-center space-x-3">
-                  <Avatar className="border-2 border-blue-200">
+                  <Avatar className="border-2 border-blue-200 dark:border-blue-700">
                     <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
                       <Brain className="h-5 w-5" />
                     </AvatarFallback>
@@ -354,28 +383,28 @@ Silakan coba tanya lagi dengan cara yang berbeda, atau pilih salah satu pertanya
                     </CardTitle>
                     <CardDescription className="flex items-center text-sm">
                       <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
-                      Siap membantu dengan AI & Machine Learning
+                      Siap membantu Anda belajar
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
 
-              <CardContent className="flex-1 p-0">
-                <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
-                  <div className="space-y-4">
+              <CardContent className="flex-1 p-0 overflow-hidden">
+                <ScrollArea className="h-full" ref={scrollAreaRef}>
+                  <div className="p-4 space-y-4">
                     {messages.map((message) => (
                       <div
                         key={message.id}
                         className={`flex ${message.type === "user" ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`flex space-x-2 max-w-[90%] md:max-w-[85%] ${message.type === "user" ? "flex-row-reverse space-x-reverse" : ""}`}
+                          className={`flex space-x-2 max-w-[85%] ${message.type === "user" ? "flex-row-reverse space-x-reverse" : ""}`}
                         >
                           <Avatar className="w-8 h-8 flex-shrink-0">
                             <AvatarFallback
                               className={
                                 message.type === "user"
-                                  ? "bg-gray-100"
+                                  ? "bg-gray-100 dark:bg-gray-700"
                                   : "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
                               }
                             >
@@ -383,20 +412,20 @@ Silakan coba tanya lagi dengan cara yang berbeda, atau pilih salah satu pertanya
                             </AvatarFallback>
                           </Avatar>
                           <div
-                            className={`rounded-lg p-3 md:p-4 ${
+                            className={`rounded-lg p-3 md:p-4 break-words ${
                               message.type === "user"
                                 ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white"
-                                : "bg-white border shadow-sm"
+                                : "bg-white dark:bg-card border shadow-sm dark:border-gray-700"
                             }`}
                           >
                             <div className="whitespace-pre-wrap text-sm leading-relaxed">
                               {message.content}
                               {message.isStreaming && (
-                                <span className="inline-block w-2 h-4 bg-gray-400 ml-1 animate-pulse"></span>
+                                <span className="inline-block w-2 h-4 bg-gray-400 dark:bg-gray-500 ml-1 animate-pulse"></span>
                               )}
                             </div>
                             <div
-                              className={`text-xs mt-2 ${message.type === "user" ? "text-blue-100" : "text-gray-500"}`}
+                              className={`text-xs mt-2 ${message.type === "user" ? "text-blue-100" : "text-gray-500 dark:text-gray-400"}`}
                             >
                               {message.timestamp.toLocaleTimeString("id-ID", {
                                 hour: "2-digit",
@@ -416,7 +445,7 @@ Silakan coba tanya lagi dengan cara yang berbeda, atau pilih salah satu pertanya
                               <Brain className="h-4 w-4" />
                             </AvatarFallback>
                           </Avatar>
-                          <div className="bg-white border shadow-sm rounded-lg p-4">
+                          <div className="bg-white dark:bg-card border shadow-sm dark:border-gray-700 rounded-lg p-4">
                             <div className="flex items-center space-x-2">
                               <div className="flex space-x-1">
                                 <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
@@ -429,7 +458,7 @@ Silakan coba tanya lagi dengan cara yang berbeda, atau pilih salah satu pertanya
                                   style={{ animationDelay: "0.2s" }}
                                 ></div>
                               </div>
-                              <span className="text-sm text-gray-600">AI sedang berpikir...</span>
+                              <span className="text-sm text-gray-600 dark:text-gray-400">AI sedang berpikir...</span>
                             </div>
                           </div>
                         </div>
@@ -439,10 +468,10 @@ Silakan coba tanya lagi dengan cara yang berbeda, atau pilih salah satu pertanya
                 </ScrollArea>
               </CardContent>
 
-              <div className="border-t p-4 bg-gray-50">
+              <div className="border-t dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800 flex-shrink-0">
                 <div className="flex space-x-2">
                   <Input
-                    placeholder="Tanya apa saja tentang pelajaran..."
+                    placeholder="Tanyakan apa saja tentang pelajaran Anda..."
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyPress={(e) => {
@@ -455,9 +484,6 @@ Silakan coba tanya lagi dengan cara yang berbeda, atau pilih salah satu pertanya
                     disabled={isTyping}
                   />
                   <Button size="icon" variant="outline" disabled className="hidden sm:flex bg-transparent">
-                    <Mic className="h-4 w-4" />
-                  </Button>
-                  <Button size="icon" variant="outline" disabled className="hidden sm:flex bg-transparent">
                     <ImageIcon className="h-4 w-4" />
                   </Button>
                   <Button
@@ -468,8 +494,8 @@ Silakan coba tanya lagi dengan cara yang berbeda, atau pilih salah satu pertanya
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  💡 Tips: Semakin spesifik pertanyaan Anda, semakin detail jawaban AI
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  💡 Tips: Ajukan pertanyaan spesifik untuk mendapatkan penjelasan yang lebih detail
                 </p>
               </div>
             </Card>
@@ -484,21 +510,21 @@ Silakan coba tanya lagi dengan cara yang berbeda, atau pilih salah satu pertanya
                   <Lightbulb className="h-5 w-5 text-yellow-500" />
                   <span>Pertanyaan Populer</span>
                 </CardTitle>
-                <CardDescription className="text-sm">Klik untuk bertanya langsung</CardDescription>
+                <CardDescription className="text-sm">Klik untuk langsung bertanya</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 {quickQuestions.slice(0, 4).map((question, index) => (
                   <Button
                     key={index}
                     variant="outline"
-                    className="w-full justify-start text-left h-auto p-3 bg-transparent hover:bg-blue-50"
+                    className="w-full justify-start text-left h-auto p-3 bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20"
                     onClick={() => handleSendMessage(question.text)}
                     disabled={isTyping}
                   >
-                    <div className="flex items-start space-x-2">
-                      <div className="p-1 bg-blue-100 rounded">{question.icon}</div>
-                      <div className="flex-1">
-                        <div className="text-xs font-medium">{question.text}</div>
+                    <div className="flex items-center space-x-2 w-full">
+                      <div className="p-1 bg-blue-100 dark:bg-blue-900/20 rounded flex-shrink-0">{question.icon}</div>
+                      <div className="flex-1 min-w-0 text-left">
+                        <div className="text-xs font-medium truncate">{question.text}</div>
                         <Badge variant="secondary" className="text-xs mt-1">
                           {question.subject}
                         </Badge>
@@ -519,19 +545,19 @@ Silakan coba tanya lagi dengan cara yang berbeda, atau pilih salah satu pertanya
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center space-x-2 text-sm">
-                  <BookOpen className="h-4 w-4 text-blue-600" />
+                  <BookOpen className="h-4 w-4 text-blue-600 flex-shrink-0" />
                   <span>Penjelasan konsep mendalam</span>
                 </div>
                 <div className="flex items-center space-x-2 text-sm">
-                  <Calculator className="h-4 w-4 text-green-600" />
+                  <Calculator className="h-4 w-4 text-green-600 flex-shrink-0" />
                   <span>Pemecahan soal step-by-step</span>
                 </div>
                 <div className="flex items-center space-x-2 text-sm">
-                  <FileText className="h-4 w-4 text-purple-600" />
+                  <FileText className="h-4 w-4 text-purple-600 flex-shrink-0" />
                   <span>Bantuan tugas & PR</span>
                 </div>
                 <div className="flex items-center space-x-2 text-sm">
-                  <Beaker className="h-4 w-4 text-orange-600" />
+                  <Beaker className="h-4 w-4 text-orange-600 flex-shrink-0" />
                   <span>Simulasi eksperimen</span>
                 </div>
               </CardContent>
@@ -556,16 +582,16 @@ Silakan coba tanya lagi dengan cara yang berbeda, atau pilih salah satu pertanya
                 <Button
                   key={index}
                   variant="outline"
-                  className="w-full justify-start text-left h-auto p-3 bg-transparent hover:bg-blue-50"
+                  className="w-full justify-start text-left h-auto p-3 bg-transparent hover:bg-blue-50 dark:hover:bg-blue-900/20"
                   onClick={() => {
                     handleSendMessage(question.text)
                     setIsQuickQuestionsOpen(false)
                   }}
                   disabled={isTyping}
                 >
-                  <div className="flex items-start space-x-2">
-                    <div className="p-1 bg-blue-100 rounded">{question.icon}</div>
-                    <div className="flex-1">
+                  <div className="flex items-center space-x-2 w-full">
+                    <div className="p-1 bg-blue-100 dark:bg-blue-900/20 rounded flex-shrink-0">{question.icon}</div>
+                    <div className="flex-1 min-w-0 text-left">
                       <div className="text-sm font-medium">{question.text}</div>
                       <Badge variant="secondary" className="text-xs mt-1">
                         {question.subject}
@@ -587,21 +613,21 @@ Silakan coba tanya lagi dengan cara yang berbeda, atau pilih salah satu pertanya
                 {isCapabilitiesOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </Button>
             </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-3 mt-2 p-4 bg-white rounded-lg border">
+            <CollapsibleContent className="space-y-3 mt-2 p-4 bg-white dark:bg-card rounded-lg border dark:border-gray-700">
               <div className="flex items-center space-x-2 text-sm">
-                <BookOpen className="h-4 w-4 text-blue-600" />
+                <BookOpen className="h-4 w-4 text-blue-600 flex-shrink-0" />
                 <span>Penjelasan konsep mendalam</span>
               </div>
               <div className="flex items-center space-x-2 text-sm">
-                <Calculator className="h-4 w-4 text-green-600" />
+                <Calculator className="h-4 w-4 text-green-600 flex-shrink-0" />
                 <span>Pemecahan soal step-by-step</span>
               </div>
               <div className="flex items-center space-x-2 text-sm">
-                <FileText className="h-4 w-4 text-purple-600" />
+                <FileText className="h-4 w-4 text-purple-600 flex-shrink-0" />
                 <span>Bantuan tugas & PR</span>
               </div>
               <div className="flex items-center space-x-2 text-sm">
-                <Beaker className="h-4 w-4 text-orange-600" />
+                <Beaker className="h-4 w-4 text-orange-600 flex-shrink-0" />
                 <span>Simulasi eksperimen</span>
               </div>
             </CollapsibleContent>
