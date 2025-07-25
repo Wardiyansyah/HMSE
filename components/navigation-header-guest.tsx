@@ -10,15 +10,14 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { useAppStore } from '@/lib/store';
 import { Brain, Home, Sparkles, MessageCircle, BarChart3, BookOpen, Users, Settings, Menu, ChevronDown, User } from 'lucide-react';
 
-const userguest = {
-  name: 'Pengunjung',
-
-  role: 'guest',
-};
-
-export function NavigationHeader() {
+export function NavigationHeaderGuest() {
   const { user } = useAppStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const userguest = {
+    name: 'Pengunjung',
+    email: 'example@gmail.com',
+    role: 'guest',
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
@@ -42,9 +41,9 @@ export function NavigationHeader() {
           <div className="flex items-center space-x-3">
             {/* User Info - Hidden on small screens */}
             <div className="hidden lg:block text-right">
-              <p className="text-sm font-medium">{user?.name}</p>
+              <p className="text-sm font-medium">{userguest?.name}</p>
               <Badge variant="secondary" className="text-xs">
-                {user?.role === 'student' ? 'Siswa' : user?.role === 'teacher' ? 'Guru' : 'Profesional'}
+                {user?.role === 'student' ? 'Siswa' : userguest?.role}
               </Badge>
             </div>
 
@@ -66,24 +65,19 @@ export function NavigationHeader() {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium">{user?.name}</p>
-                    <p className="text-xs text-gray-500">{user?.email}</p>
+                    <p className="text-sm font-medium">{userguest?.name}</p>
+                    <p className="text-xs text-gray-500">{userguest?.email}</p>
                     <Badge variant="secondary" className="text-xs w-fit">
-                      {user?.role === 'student' ? 'Siswa' : user?.role === 'teacher' ? 'Guru' : 'Profesional'}
+                      {user?.role === 'student' ? 'Siswa' : userguest?.role}
                     </Badge>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+
                 <DropdownMenuItem asChild>
-                  <Link href="/settings" className="flex items-center space-x-2 cursor-pointer">
+                  <Link href="/login" className="flex items-center space-x-2 cursor-pointer">
                     <User className="h-4 w-4" />
-                    <span>Profil</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/settings" className="flex items-center space-x-2 cursor-pointer">
-                    <Settings className="h-4 w-4" />
-                    <span>Pengaturan</span>
+                    <span>Masuk</span>
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>

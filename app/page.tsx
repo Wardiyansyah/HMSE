@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Bot } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link'; // Import Link
+import { NavigationHeaderGuest } from '@/components/navigation-header-guest';
 
 const Home: NextPage = () => {
   const [chatOpen, setChatOpen] = useState(false);
@@ -44,7 +45,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <NavigationHeader />
+      <NavigationHeaderGuest />
       <main>
         <HeroSection />
         <FeaturesSection />

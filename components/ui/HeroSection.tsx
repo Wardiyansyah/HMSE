@@ -13,7 +13,7 @@ const HeroSection = () => {
         </p>
         <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
           <div className="rounded-md shadow">
-            <Link href="/register" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10">
+            <Link href="/login" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10">
               Mulai Sekarang
             </Link>
           </div>
@@ -21,11 +21,7 @@ const HeroSection = () => {
       </div>
       <div className="mt-16 flex justify-center">
         <div className="relative rounded-lg shadow-xl overflow-hidden w-full max-w-4xl">
-          <img
-            className="w-full h-auto"
-            src="/dasboard.png"
-            alt="Preview dashboard EduAI"
-          />
+          <img className="w-full h-auto" src="/dasboard.png" alt="Preview dashboard EduAI" />
         </div>
       </div>
     </section>
