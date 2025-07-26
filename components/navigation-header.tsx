@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -10,15 +11,51 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { useAppStore } from '@/lib/store';
 import { Brain, Home, Sparkles, MessageCircle, BarChart3, BookOpen, Users, Settings, Menu, ChevronDown, User } from 'lucide-react';
 
-const userguest = {
-  name: 'Pengunjung',
-
-  role: 'guest',
-};
+const menuItems = [
+  {
+    title: 'Dashboard',
+    url: '/dashboard',
+    icon: Home,
+    description: 'Halaman utama dan overview',
+  },
+  {
+    title: 'AI Content Generator',
+    url: '/content-generator',
+    icon: Sparkles,
+    description: 'Buat materi pembelajaran dengan AI',
+  },
+  {
+    title: 'Virtual Tutor',
+    url: '/virtual-tutor',
+    icon: MessageCircle,
+    description: 'Chat dengan AI tutor 24/7',
+  },
+  {
+    title: 'Learning Analytics',
+    url: '/analytics',
+    icon: BarChart3,
+    description: 'Analisis perkembangan belajar',
+  },
+  {
+    title: 'Perpustakaan',
+    url: '/library',
+    icon: BookOpen,
+    description: 'Koleksi materi pembelajaran',
+  },
+  {
+    title: 'Komunitas',
+    url: '/community',
+    icon: Users,
+    description: 'Diskusi dan berbagi pengalaman',
+  },
+];
 
 export function NavigationHeader() {
+  const pathname = usePathname();
   const { user } = useAppStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const currentPage = menuItems.find((item) => item.url === pathname);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
@@ -36,6 +73,48 @@ export function NavigationHeader() {
                 <p className="text-xs text-gray-600">AI Education Platform</p>
               </div>
             </Link>
+
+            {/* Desktop Navigation Dropdown */}
+            <div className="hidden md:block">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center space-x-2 h-10">
+                    {currentPage?.icon && <currentPage.icon className="h-4 w-4" />}
+                    <span className="font-medium">{currentPage?.title || 'Menu'}</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-72">
+                  <DropdownMenuLabel className="text-sm font-semibold">Menu Navigasi</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {menuItems.map((item) => (
+                    <DropdownMenuItem key={item.title} asChild>
+                      <Link href={item.url} className="flex items-start space-x-3 p-3 cursor-pointer">
+                        <div className="p-1.5 bg-gray-100 rounded-md">
+                          <item.icon className="h-4 w-4 text-gray-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium text-sm">{item.title}</div>
+                          <div className="text-xs text-gray-500 mt-0.5">{item.description}</div>
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings" className="flex items-center space-x-3 p-3 cursor-pointer">
+                      <div className="p-1.5 bg-gray-100 rounded-md">
+                        <Settings className="h-4 w-4 text-gray-600" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-sm">Pengaturan</div>
+                        <div className="text-xs text-gray-500 mt-0.5">Kelola profil dan preferensi</div>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
           {/* Right Side - User Profile */}
@@ -125,6 +204,29 @@ export function NavigationHeader() {
                             {user?.role === 'student' ? 'Siswa' : user?.role === 'teacher' ? 'Guru' : 'Profesional'}
                           </Badge>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Navigation Menu */}
+                    <div>
+                      <h3 className="font-semibold mb-3">Menu Utama</h3>
+                      <div className="space-y-2">
+                        {menuItems.map((item) => (
+                          <Link
+                            key={item.title}
+                            href={item.url}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className={`flex items-start space-x-3 p-3 rounded-lg transition-colors ${pathname === item.url ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100'}`}
+                          >
+                            <div className="p-1.5 bg-white rounded-md shadow-sm">
+                              <item.icon className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <div className="font-medium">{item.title}</div>
+                              <div className="text-xs text-gray-500">{item.description}</div>
+                            </div>
+                          </Link>
+                        ))}
                       </div>
                     </div>
 
