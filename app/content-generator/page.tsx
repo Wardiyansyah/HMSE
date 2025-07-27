@@ -613,7 +613,7 @@ PEDOMAN:
         </div>
       </div>
 
-      <div className="container mx-auto px-4 pb-12">
+      <div className="container mx-auto px-4 pt-10 pb-12">
         {/* Error Display */}
         {error && (
           <Card className="mb-6 border-red-200 bg-red-50 dark:bg-red-900/20 max-w-4xl mx-auto">

@@ -37,13 +37,13 @@ const menuItems = [
     description: 'Analisis perkembangan belajar',
   },
   {
-    title: 'Perpustakaan',
+    title: 'Materi Pembelajaran',
     url: '/library',
     icon: BookOpen,
     description: 'Koleksi materi pembelajaran',
   },
   {
-    title: 'Komunitas',
+    title: 'Grup Belajar',
     url: '/community',
     icon: Users,
     description: 'Diskusi dan berbagi pengalaman',
@@ -64,7 +64,7 @@ export function NavigationHeader() {
           {/* Left Side - Logo + Navigation Dropdown */}
           <div className="flex items-center space-x-4">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2">
+            <Link href="/dashboard" className="flex items-center space-x-2">
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
                 <Brain className="h-5 w-5 text-white" />
               </div>
