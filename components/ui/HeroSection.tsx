@@ -21,7 +21,7 @@ const HeroSection = () => {
       </div>
       <div className="mt-16 flex justify-center">
         <div className="relative rounded-lg shadow-xl overflow-hidden w-full max-w-4xl">
-          <img className="w-full h-auto" src="/dasboard.png" alt="Preview dashboard EduAI" />
+          {/* <img className="w-full h-auto" src="/dasboard.png" alt="Preview dashboard EduAI" /> */}
         </div>
       </div>
     </section>

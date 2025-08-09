@@ -277,7 +277,7 @@ export default function SettingsPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              {/* <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2 text-lg">
                     <Globe className="h-5 w-5" />
@@ -315,10 +315,10 @@ export default function SettingsPage() {
                         </SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
+                  </div> */}
 
                   {/* Language Preview */}
-                  <div className="mt-4 p-4 border dark:border-gray-700 rounded-lg bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20">
+                  {/* <div className="mt-4 p-4 border dark:border-gray-700 rounded-lg bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20">
                     <h4 className="font-semibold mb-2">
                       {language === "id" ? t("common.language-preview") : t("common.language-preview")}
                     </h4>
@@ -331,8 +331,8 @@ export default function SettingsPage() {
                         : t("common.changes-applied-automatically")}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </CardContent> */}
+              {/* </Card> */}
             </div>
           </TabsContent>
 

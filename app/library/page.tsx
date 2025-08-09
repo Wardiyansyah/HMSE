@@ -269,7 +269,7 @@ export default function Library() {
                     ))}
                   </SelectContent>
                 </Select>
-                <Select value={selectedLevel} onValueChange={setSelectedLevel}>
+                {/* <Select value={selectedLevel} onValueChange={setSelectedLevel}>
                   <SelectTrigger className="w-32">
                     <SelectValue />
                   </SelectTrigger>
@@ -280,7 +280,7 @@ export default function Library() {
                       </SelectItem>
                     ))}
                   </SelectContent>
-                </Select>
+                </Select> */}
                 <Button onClick={handleSearch} disabled={selectedCategory === "all" || selectedLevel === "all"}>
                   <Search className="h-4 w-4" />
                 </Button>

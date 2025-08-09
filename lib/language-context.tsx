@@ -104,7 +104,7 @@ const translations = {
       'Maaf, saya mengalami sedikit gangguan teknis. Namun saya tetap bisa membantu Anda! \n\nUntuk pertanyaan "{{content}}", saya sarankan:\n\n1. **Coba pecah pertanyaan** menjadi bagian-bagian kecil\n2. **Cari kata kunci utama** dari topik yang ingin dipelajari  \n3. **Hubungkan dengan konsep** yang sudah Anda pahami sebelumnya\n\nSilakan coba tanya lagi dengan cara yang berbeda, atau pilih salah satu pertanyaan cepat. Saya siap membantu! 😊',
 
     // Library
-    "library.title": "Perpustakaan Digital",
+    "library.title": "Materi Pembelajaran",
     "library.subtitle": "Koleksi lengkap materi pembelajaran berkualitas tinggi dengan video YouTube terpilih",
     "library.search": "Cari materi pembelajaran...",
     "library.all-categories": "Semua Kategori",

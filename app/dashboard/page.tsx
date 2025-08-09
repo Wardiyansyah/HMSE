@@ -344,11 +344,11 @@ export default function EduGenAIDashboard() {
                         <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">{item.icon}</div>
                         <div className="flex-1">
                           <h4 className="font-medium text-sm md:text-base">{item.title}</h4>
-                          <div className="flex items-center space-x-2 text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                          <div className="flex flex-col items-start space-x-2 text-xs md:text-sm sm:flex-row sm:items-center text-gray-600 dark:text-gray-400">
                             <Badge variant="secondary">{item.type}</Badge>
-                            <span>•</span>
-                            <span>{item.duration}</span>
-                            <span>•</span>
+                            <span className="hidden sm:block">•</span>
+                            <span className="py-1">{item.duration}</span>
+                            <span className="hidden sm:block">•</span>
                             <Badge variant="outline">{item.level}</Badge>
                           </div>
                         </div>
@@ -356,7 +356,7 @@ export default function EduGenAIDashboard() {
                       <Link href={item.url}>
                         <Button size="sm">
                           {t("common.start")}
-                          <ChevronRight className="h-4 w-4 ml-1" />
+                          <ChevronRight className="h-4 w-4" />
                         </Button>
                       </Link>
                     </div>
@@ -373,7 +373,7 @@ export default function EduGenAIDashboard() {
               </CardHeader>
               <CardContent>
                 <Tabs defaultValue="content-generator" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
+                  <TabsList className="grid w-full h-full grid-cols-2 lg:grid-cols-4">
                     <TabsTrigger value="content-generator" className="text-xs">
                       {t("nav.content-generator")}
                     </TabsTrigger>

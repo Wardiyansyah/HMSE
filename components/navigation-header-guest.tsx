@@ -63,7 +63,7 @@ export function NavigationHeaderGuest() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>
+                {/* <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium">{userguest?.name}</p>
                     <p className="text-xs text-gray-500">{userguest?.email}</p>
@@ -72,7 +72,7 @@ export function NavigationHeaderGuest() {
                     </Badge>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator /> */}
 
                 <DropdownMenuItem asChild>
                   <Link href="/login" className="flex items-center space-x-2 cursor-pointer">
@@ -84,9 +84,9 @@ export function NavigationHeaderGuest() {
             </DropdownMenu>
 
             {/* Mobile Menu */}
-            <div className="md:hidden">
-              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-                <SheetTrigger asChild>
+            {/* <div className="md:hidden"> */}
+              {/* <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}> */}
+                {/* <SheetTrigger asChild>
                   <Button variant="outline" size="icon">
                     <Menu className="h-4 w-4" />
                   </Button>
@@ -99,9 +99,9 @@ export function NavigationHeaderGuest() {
                     </SheetTitle>
                     <SheetDescription>Menu navigasi dan pengaturan</SheetDescription>
                   </SheetHeader>
-                  <div className="mt-6 space-y-4">
+                  <div className="mt-6 space-y-4"> */}
                     {/* User Info */}
-                    <div className="bg-gray-50 p-4 rounded-lg">
+                    {/* <div className="bg-gray-50 p-4 rounded-lg">
                       <div className="flex items-center space-x-3">
                         <Avatar className="h-12 w-12">
                           <AvatarImage src="/placeholder.svg?height=48&width=48" />
@@ -120,10 +120,10 @@ export function NavigationHeaderGuest() {
                           </Badge>
                         </div>
                       </div>
-                    </div>
+                    </div> */}
 
                     {/* Settings */}
-                    <div className="border-t pt-4">
+                    {/* <div className="border-t pt-4">
                       <Link href="/settings" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-colors">
                         <div className="p-1.5 bg-white rounded-md shadow-sm">
                           <Settings className="h-4 w-4" />
@@ -133,11 +133,11 @@ export function NavigationHeaderGuest() {
                           <div className="text-xs text-gray-500">Kelola profil dan preferensi</div>
                         </div>
                       </Link>
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </div>
+                    </div> */}
+                  {/* </div>
+                </SheetContent> */}
+              {/* </Sheet> */}
+            {/* </div> */}
           </div>
         </div>
       </div>
