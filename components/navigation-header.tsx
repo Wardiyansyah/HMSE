@@ -57,7 +57,7 @@ export function NavigationHeader() {
   const currentPage = menuItems.find((item) => item.url === pathname);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-gray-800 dark:border-gray-700">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Left Side - Logo + Navigation Dropdown */}
