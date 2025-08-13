@@ -9,8 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useAppStore } from '@/lib/store';
-import { Brain, Home, Sparkles, MessageCircle, BarChart3, BookOpen, Users, Settings, Menu, ChevronDown, User } from 'lucide-react';
-
+import { Brain, Home, Sparkles, MessageCircle, BarChart3, BookOpen, Users, Settings, Menu, ChevronDown, User, LogOut } from 'lucide-react';
 const menuItems = [
   {
     title: 'Dashboard',
@@ -163,6 +162,12 @@ export function NavigationHeader() {
                   <Link href="/settings" className="flex items-center space-x-2 cursor-pointer">
                     <Settings className="h-4 w-4" />
                     <span>Pengaturan</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/" className="flex items-center space-x-2 cursor-pointer">
+                    <LogOut className="h-4 w-4" />
+                    <span>Keluar</span>
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
