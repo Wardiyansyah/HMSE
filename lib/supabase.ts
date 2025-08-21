@@ -1,49 +1,116 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Client-side Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Server-side Supabase client (for Server Actions/Route Handlers)
-// This client should only be used in server environments and requires the service role key
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import type { cookies } from 'next/headers';
-
-export function createServerSupabaseClient(cookieStore: ReturnType<typeof cookies>) {
-  return createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
-    cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value;
-      },
-      set(name: string, value: string, options: CookieOptions) {
-        cookieStore.set({ name, value, ...options });
-      },
-      remove(name: string, options: CookieOptions) {
-        cookieStore.set({ name, value: '', ...options });
-      },
-    },
-  });
+// Type definitions for database tables
+export interface Profile {
+  id: string;
+  email: string;
+  username: string;
+  password_hash: string;
+  full_name: string;
+  role: 'student' | 'teacher' | 'admin';
+  avatar_url?: string;
+  phone?: string;
+  address?: string;
+  date_of_birth?: string;
+  gender?: 'male' | 'female';
+  status: 'active' | 'inactive' | 'suspended';
+  created_at: string;
+  updated_at: string;
 }
 
-// ---------- server helpers ----------
-/**
- * Returns a Supabase client that uses the service-role key.
- * Call this **only** in server code (Server Actions / Route Handlers).
- */
-export function getSupabaseAdmin() {
-  if (typeof window !== 'undefined') {
-    throw new Error('getSupabaseAdmin() must be called on the server.');
-  }
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!serviceRoleKey) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY is missing.');
-  }
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
+export interface Class {
+  id: string;
+  nama_kelas: string;
+  tingkat: number;
+  jurusan?: string;
+  tahun_ajaran: string;
+  wali_kelas_id?: string;
+  kapasitas: number;
+  status: 'active' | 'inactive';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Subject {
+  id: string;
+  kode_mata_pelajaran: string;
+  nama_mata_pelajaran: string;
+  tingkat: number[];
+  deskripsi?: string;
+  sks: number;
+  status: 'active' | 'inactive';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Teacher {
+  id: string;
+  user_id: string;
+  nip: string;
+  mata_pelajaran_id?: string;
+  jabatan?: string;
+  pendidikan_terakhir?: string;
+  tanggal_mulai_kerja?: string;
+  status: 'active' | 'inactive' | 'retired';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Student {
+  id: string;
+  user_id: string;
+  nisn: string;
+  nis: string;
+  class_id?: string;
+  tanggal_masuk?: string;
+  nama_orang_tua?: string;
+  pekerjaan_orang_tua?: string;
+  no_hp_orang_tua?: string;
+  status: 'active' | 'inactive' | 'graduated' | 'transferred';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Assignment {
+  id: string;
+  title: string;
+  description?: string;
+  subject_id: string;
+  class_id: string;
+  teacher_id: string;
+  due_date?: string;
+  max_score: number;
+  status: 'draft' | 'published' | 'closed';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Grade {
+  id: string;
+  student_id: string;
+  assignment_id: string;
+  subject_id: string;
+  score?: number;
+  max_score: number;
+  grade_letter?: string;
+  feedback?: string;
+  graded_by?: string;
+  graded_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  is_read: boolean;
+  created_at: string;
 }
