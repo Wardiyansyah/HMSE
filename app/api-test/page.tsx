@@ -1,10 +1,10 @@
-"use client"
+'use client';
 
-import { NavigationHeader } from "@/components/navigation-header"
-import { ApiKeyChecker } from "@/components/api-key-checker"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { CheckCircle, Settings } from "lucide-react"
+import { NavigationHeader } from '@/components/navigation-header-student';
+import { ApiKeyChecker } from '@/components/api-key-checker';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle, Settings } from 'lucide-react';
 
 export default function ApiTestPage() {
   return (
@@ -17,9 +17,7 @@ export default function ApiTestPage() {
             <Settings className="h-6 w-6 md:h-8 md:w-8 mr-2 md:mr-3 text-blue-600" />
             API Configuration
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
-            Setup dan test konfigurasi API untuk mengaktifkan fitur AI
-          </p>
+          <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">Setup dan test konfigurasi API untuk mengaktifkan fitur AI</p>
         </div>
 
         <div className="space-y-6">
@@ -65,5 +63,5 @@ export default function ApiTestPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

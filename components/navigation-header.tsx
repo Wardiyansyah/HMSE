@@ -9,7 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useAppStore } from '@/lib/store';
-import { Brain, Home, Sparkles, MessageCircle, BarChart3, BookOpen, Users, Settings, Menu, ChevronDown, User, LogOut } from 'lucide-react';
+import { Brain, Home, Sparkles, MessageCircle, BarChart3, BookOpen, Users, Settings, Menu, ChevronDown, User } from 'lucide-react';
+
 const menuItems = [
   {
     title: 'Dashboard',
@@ -57,7 +58,7 @@ export function NavigationHeader() {
   const currentPage = menuItems.find((item) => item.url === pathname);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-gray-800 dark:border-gray-700">
+    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Left Side - Logo + Navigation Dropdown */}
@@ -162,12 +163,6 @@ export function NavigationHeader() {
                   <Link href="/settings" className="flex items-center space-x-2 cursor-pointer">
                     <Settings className="h-4 w-4" />
                     <span>Pengaturan</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/" className="flex items-center space-x-2 cursor-pointer">
-                    <LogOut className="h-4 w-4" />
-                    <span>Keluar</span>
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>

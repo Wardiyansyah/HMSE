@@ -2,7 +2,7 @@
 
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { NavigationHeader } from '../components/navigation-header';
+import { NavigationHeader } from '../components/navigation-header-student';
 import HeroSection from '../components/ui/HeroSection';
 import FeaturesSection from '../components/ui/FeaturesSection';
 import TestimonialsSection from '../components/ui/TestimonialsSection';

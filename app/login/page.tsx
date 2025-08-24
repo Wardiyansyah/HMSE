@@ -93,10 +93,11 @@ export default function LoginPage() {
           <GraduationCap className="mx-auto h-12 w-12 text-blue-600" />
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Masuk ke Akun Anda</h2>
           <p className="mt-2 text-sm text-gray-600">
-            Belum punya akun?{' '}
+            Belum punya akun?
             <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
               Daftar di sini
             </Link>
+            <p className="text-gray-400">sementara</p>
           </p>
         </div>
 
@@ -157,15 +158,15 @@ export default function LoginPage() {
               <div className="space-y-2 text-xs text-gray-600">
                 <div className="flex justify-between">
                   <span>Siswa:</span>
-                  <span className="font-mono">siswa1 / password123</span>
+                  <span className="font-mono">jamal / password123</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Guru:</span>
-                  <span className="font-mono">guru1 / password123</span>
+                  <span className="font-mono">samsudin / password123</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Admin:</span>
-                  <span className="font-mono">admin1 / password123</span>
+                  <span className="font-mono">dalam pengembangan</span>
                 </div>
               </div>
             </div>

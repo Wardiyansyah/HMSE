@@ -1,590 +1,512 @@
 'use client';
-
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { BookOpen, Calendar, FileText, GraduationCap, Loader2, Plus, TrendingUp, Users, AlertCircle, Edit, Eye } from 'lucide-react';
-import { getCurrentUser, clearUserSession } from '@/lib/auth-helpers';
-import { supabase } from '@/lib/supabase';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAppStore } from '@/lib/store';
+import { NavigationHeader } from '@/components/navigation-header-student';
+import { useLanguage } from '@/lib/language-context';
+import Link from 'next/link';
+import { BookOpen, Brain, MessageCircle, BarChart3, Users, GraduationCap, Sparkles, TrendingUp, Clock, Award, Play, FileText, Mic, ChevronRight, Target, Zap } from 'lucide-react';
 
-interface Assignment {
-  id: string;
-  title: string;
-  description: string;
-  subject_id: string;
-  class_id: string;
-  teacher_id: string;
-  due_date: string;
-  max_score: number;
-  status: 'draft' | 'published' | 'closed';
-  created_at: string;
-  updated_at: string;
-  subjects?: { nama_mata_pelajaran: string; kode_mata_pelajaran: string };
-  classes?: { nama_kelas: string };
-}
+export default function EduGenAIDashboard() {
+  const { user, learningProgress, startSession } = useAppStore();
+  const { t } = useLanguage();
 
-interface Grade {
-  id: string;
-  student_id: string;
-  assignment_id: string;
-  subject_id: string;
-  teacher_id: string;
-  score: number;
-  max_score: number;
-  grade_type: 'assignment' | 'quiz' | 'exam' | 'project';
-  comments: string;
-  graded_at: string;
-  created_at: string;
-  updated_at: string;
-  subjects?: { nama_mata_pelajaran: string; kode_mata_pelajaran: string };
-  assignments?: { title: string };
-  students?: { user_id: string; profiles?: { full_name: string } };
-}
+  const recommendations = {
+    teacher: [
+      {
+        title: 'Cara Mengajar Matematika dengan Gamifikasi',
+        type: 'Course',
+        duration: '2 jam',
+        level: t('common.intermediate'),
+        icon: <GraduationCap className="h-4 w-4" />,
+        url: '/content-generator',
+      },
+      {
+        title: 'AI Tools untuk Pembuatan Konten Edukatif',
+        type: 'Workshop',
+        duration: '1.5 jam',
+        level: t('common.advanced'),
+        icon: <Brain className="h-4 w-4" />,
+        url: '/content-generator',
+      },
+    ],
+    student: [
+      {
+        title: 'Persiapan UTBK Adaptif - Matematika',
+        type: 'Learning Path',
+        duration: '4 minggu',
+        level: t('common.advanced'),
+        icon: <BookOpen className="h-4 w-4" />,
+        url: '/virtual-tutor',
+      },
+      {
+        title: 'Fisika Dasar: Hukum Newton Interaktif',
+        type: 'Module',
+        duration: '45 menit',
+        level: t('common.beginner'),
+        icon: <Play className="h-4 w-4" />,
+        url: '/virtual-tutor',
+      },
+    ],
+    professional: [
+      {
+        title: 'Digital Marketing Strategy 2024',
+        type: 'Certification',
+        duration: '6 jam',
+        level: t('common.professional'),
+        icon: <Award className="h-4 w-4" />,
+        url: '/content-generator',
+      },
+      {
+        title: 'Leadership in Digital Age',
+        type: 'Course',
+        duration: '3 jam',
+        level: 'Executive',
+        icon: <Users className="h-4 w-4" />,
+        url: '/content-generator',
+      },
+    ],
+  };
 
-interface Class {
-  id: string;
-  nama_kelas: string;
-  tingkat: number;
-  jenjang: 'SD' | 'SMP' | 'SMA';
-  jurusan?: string;
-  wali_kelas_id?: string;
-  tahun_ajaran: string;
-  kapasitas: number;
-  status: 'active' | 'inactive';
-  created_at: string;
-  updated_at: string;
-}
+  const learningStats = {
+    student: {
+      completedCourses: 12,
+      currentStreak: 7,
+      totalHours: 45,
+      achievements: 8,
+    },
+    teacher: {
+      contentCreated: 25,
+      studentsHelped: 150,
+      avgRating: 4.8,
+      totalHours: 120,
+    },
+    professional: {
+      certificationsEarned: 5,
+      skillsImproved: 12,
+      networkConnections: 89,
+      totalHours: 78,
+    },
+  };
 
-interface Subject {
-  id: string;
-  nama_mata_pelajaran: string;
-  kode_mata_pelajaran: string;
-  jenjang: 'SD' | 'SMP' | 'SMA';
-  tingkat: number[];
-  jurusan?: string;
-  sks: number;
-  deskripsi?: string;
-  status: 'active' | 'inactive';
-  created_at: string;
-  updated_at: string;
-}
-
-interface Student {
-  id: string;
-  user_id: string;
-  student_id: string;
-  class_id: string;
-  status: 'active' | 'inactive' | 'graduated';
-  enrollment_date: string;
-  created_at: string;
-  updated_at: string;
-  profiles?: { full_name: string; email: string };
-}
-
-interface Teacher {
-  id: string;
-  user_id: string;
-  employee_id: string;
-  specialization: string;
-  status: 'active' | 'inactive';
-  hire_date: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface DashboardData {
-  assignments: Assignment[];
-  grades: Grade[];
-  classes: Class[];
-  subjects: Subject[];
-  students: Student[];
-  teacher: Teacher | null;
-}
-
-export default function TeacherDashboard() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [user, setUser] = useState<any>(null);
-  const [data, setData] = useState<DashboardData>({
-    assignments: [],
-    grades: [],
-    classes: [],
-    subjects: [],
-    students: [],
-    teacher: null,
-  });
+  const currentUserRole = user?.role || 'student';
+  const currentRecommendations = recommendations[currentUserRole] || recommendations.student;
+  const currentStats = learningStats[currentUserRole] || learningStats.student;
 
   useEffect(() => {
-    loadDashboardData();
-  }, []);
+    startSession('Dashboard', 'Overview');
+  }, [startSession]);
 
-  const loadDashboardData = async () => {
-    try {
-      setLoading(true);
-      setError('');
-
-      // Get current user
-      const { user: currentUser, error: userError } = await getCurrentUser();
-      if (userError || !currentUser) {
-        console.error('User error:', userError);
-        router.push('/login');
-        return;
-      }
-
-      if (currentUser.role !== 'teacher') {
-        setError('Akses ditolak. Anda bukan guru.');
-        return;
-      }
-
-      setUser(currentUser);
-
-      // Get or create teacher profile
-      let { data: teacherData, error: teacherError } = await supabase.from('teachers').select('*').eq('user_id', currentUser.id).single();
-
-      if (teacherError && teacherError.code === 'PGRST116') {
-        // Teacher profile doesn't exist, create one
-        console.log('Creating teacher profile for user:', currentUser.id);
-        const { data: newTeacher, error: createError } = await supabase
-          .from('teachers')
-          .insert({
-            user_id: currentUser.id,
-            employee_id: `T${Date.now()}`, // Generate temporary employee ID
-            specialization: 'Umum',
-            status: 'active',
-          })
-          .select()
-          .single();
-
-        if (createError) {
-          console.error('Error creating teacher profile:', createError);
-          setError('Gagal membuat profil guru: ' + createError.message);
-          return;
-        }
-
-        teacherData = newTeacher;
-      } else if (teacherError) {
-        console.error('Error fetching teacher profile:', teacherError);
-        setError('Gagal memuat profil guru: ' + teacherError.message);
-        return;
-      }
-
-      if (!teacherData) {
-        setError('Data guru tidak ditemukan');
-        return;
-      }
-
-      // Load assignments created by this teacher
-      const { data: assignments, error: assignmentsError } = await supabase
-        .from('assignments')
-        .select(
-          `
-          *,
-          subjects (nama_mata_pelajaran, kode_mata_pelajaran),
-          classes (nama_kelas)
-        `
-        )
-        .eq('teacher_id', teacherData.id)
-        .order('created_at', { ascending: false });
-
-      if (assignmentsError) {
-        console.error('Error loading assignments:', assignmentsError);
-      }
-
-      // Load all classes (teacher can potentially teach any class)
-      const { data: classes, error: classesError } = await supabase.from('classes').select('*').eq('status', 'active').order('nama_kelas');
-
-      if (classesError) {
-        console.error('Error loading classes:', classesError);
-      }
-
-      // Load all subjects
-      const { data: subjects, error: subjectsError } = await supabase.from('subjects').select('*').eq('status', 'active').order('nama_mata_pelajaran');
-
-      if (subjectsError) {
-        console.error('Error loading subjects:', subjectsError);
-      }
-
-      // Load students from all classes (for now)
-      const { data: students, error: studentsError } = await supabase
-        .from('students')
-        .select(
-          `
-          *,
-          profiles:users!students_user_id_fkey (full_name, email)
-        `
-        )
-        .eq('status', 'active');
-
-      if (studentsError) {
-        console.error('Error loading students:', studentsError);
-      }
-
-      // Load grades given by this teacher
-      const { data: grades, error: gradesError } = await supabase
-        .from('grades')
-        .select(
-          `
-          *,
-          subjects (nama_mata_pelajaran, kode_mata_pelajaran),
-          assignments (title),
-          students (
-            user_id,
-            profiles:users!students_user_id_fkey (full_name)
-          )
-        `
-        )
-        .eq('teacher_id', teacherData.id)
-        .order('graded_at', { ascending: false });
-
-      if (gradesError) {
-        console.error('Error loading grades:', gradesError);
-      }
-
-      setData({
-        assignments: assignments || [],
-        grades: grades || [],
-        classes: classes || [],
-        subjects: subjects || [],
-        students: students || [],
-        teacher: teacherData,
-      });
-    } catch (err) {
-      console.error('Error loading dashboard:', err);
-      setError('Gagal memuat data dashboard: ' + (err as Error).message);
-    } finally {
-      setLoading(false);
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case 'student':
+        return t('common.student');
+      case 'teacher':
+        return t('common.teacher');
+      case 'professional':
+        return t('common.professional');
+      default:
+        return role;
     }
   };
 
-  const handleLogout = async () => {
-    clearUserSession();
-    router.push('/login');
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Memuat dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Alert variant="destructive" className="max-w-md">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
-  const draftAssignments = data.assignments.filter((a) => a.status === 'draft');
-  const publishedAssignments = data.assignments.filter((a) => a.status === 'published');
-  const totalStudents = data.students.length;
-  const averageGrade = data.grades.length > 0 ? data.grades.reduce((sum, grade) => sum + (grade.score / grade.max_score) * 100, 0) / data.grades.length : 0;
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <GraduationCap className="h-8 w-8 text-blue-600" />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Dashboard Guru</h1>
-                <p className="text-gray-600">Selamat datang, {user?.nama}</p>
-                {data.teacher && (
-                  <p className="text-sm text-gray-500">
-                    ID Pegawai: {data.teacher.employee_id} | Spesialisasi: {data.teacher.specialization}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/assignments/create">
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Buat Tugas Baru
-                </Button>
-              </Link>
-              <Button onClick={handleLogout} variant="outline">
-                Logout
-              </Button>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-950 dark:to-black">
+      <NavigationHeader />
+
+      <div className="container mx-auto px-4 py-6 max-w-7xl">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{t('dashboard.welcome')}, Jamaludin👋</h2>
+              <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
+                {currentUserRole === 'student' && t('dashboard.student.subtitle')}
+                {currentUserRole === 'teacher' && t('dashboard.teacher.subtitle')}
+                {currentUserRole === 'professional' && t('dashboard.professional.subtitle')}
+              </p>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <FileText className="h-8 w-8 text-blue-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Tugas</p>
-                  <p className="text-2xl font-bold text-gray-900">{data.assignments.length}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
+          {currentUserRole === 'student' && (
+            <>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400">{t('dashboard.completed-courses')}</p>
+                      <p className="text-xl md:text-2xl font-bold text-blue-600">{currentStats.completedCourses}</p>
+                      <p className="text-xs text-green-600 flex items-center mt-1">
+                        <TrendingUp className="h-3 w-3 mr-1" />
+                        +2 {t('common.this-week')}
+                      </p>
+                    </div>
+                    <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/20 rounded-full">
+                      <BookOpen className="h-4 w-4 md:h-6 md:w-6 text-blue-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400">{t('dashboard.learning-streak')}</p>
+                      <p className="text-xl md:text-2xl font-bold text-green-600">{currentStats.currentStreak} hari</p>
+                      <p className="text-xs text-green-600 flex items-center mt-1">
+                        <Target className="h-3 w-3 mr-1" />
+                        Target: 30 hari
+                      </p>
+                    </div>
+                    <div className="p-2 md:p-3 bg-green-100 dark:bg-green-900/20 rounded-full">
+                      <TrendingUp className="h-4 w-4 md:h-6 md:w-6 text-green-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400">{t('dashboard.total-hours')}</p>
+                      <p className="text-xl md:text-2xl font-bold text-purple-600">{currentStats.totalHours}</p>
+                      <p className="text-xs text-purple-600 flex items-center mt-1">
+                        <Clock className="h-3 w-3 mr-1" />
+                        Bulan ini
+                      </p>
+                    </div>
+                    <div className="p-2 md:p-3 bg-purple-100 dark:bg-purple-900/20 rounded-full">
+                      <Clock className="h-4 w-4 md:h-6 md:w-6 text-purple-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400">{t('dashboard.achievements')}</p>
+                      <p className="text-xl md:text-2xl font-bold text-orange-600">{currentStats.achievements}</p>
+                      <p className="text-xs text-orange-600 flex items-center mt-1">
+                        <Award className="h-3 w-3 mr-1" />
+                        Badge earned
+                      </p>
+                    </div>
+                    <div className="p-2 md:p-3 bg-orange-100 dark:bg-orange-900/20 rounded-full">
+                      <Award className="h-4 w-4 md:h-6 md:w-6 text-orange-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Users className="h-8 w-8 text-green-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Siswa</p>
-                  <p className="text-2xl font-bold text-gray-900">{totalStudents}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <BookOpen className="h-8 w-8 text-purple-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Mata Pelajaran</p>
-                  <p className="text-2xl font-bold text-gray-900">{data.subjects.length}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <TrendingUp className="h-8 w-8 text-orange-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Rata-rata Nilai</p>
-                  <p className="text-2xl font-bold text-gray-900">{averageGrade.toFixed(1)}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {currentUserRole === 'teacher' && (
+            <>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400">{t('dashboard.content-created')}</p>
+                      <p className="text-xl md:text-2xl font-bold text-blue-600">{currentStats.contentCreated}</p>
+                      <p className="text-xs text-green-600 flex items-center mt-1">
+                        <TrendingUp className="h-3 w-3 mr-1" />
+                        +5 {t('common.this-week')}
+                      </p>
+                    </div>
+                    <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/20 rounded-full">
+                      <FileText className="h-4 w-4 md:h-6 md:w-6 text-blue-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400">{t('dashboard.students-helped')}</p>
+                      <p className="text-xl md:text-2xl font-bold text-green-600">{currentStats.studentsHelped}</p>
+                      <p className="text-xs text-green-600 flex items-center mt-1">
+                        <Users className="h-3 w-3 mr-1" />
+                        Aktif bulan ini
+                      </p>
+                    </div>
+                    <div className="p-2 md:p-3 bg-green-100 dark:bg-green-900/20 rounded-full">
+                      <Users className="h-4 w-4 md:h-6 md:w-6 text-green-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400">{t('dashboard.avg-rating')}</p>
+                      <p className="text-xl md:text-2xl font-bold text-purple-600">{currentStats.avgRating}/5</p>
+                      <p className="text-xs text-purple-600 flex items-center mt-1">
+                        <Award className="h-3 w-3 mr-1" />
+                        Excellent
+                      </p>
+                    </div>
+                    <div className="p-2 md:p-3 bg-purple-100 dark:bg-purple-900/20 rounded-full">
+                      <Award className="h-4 w-4 md:h-6 md:w-6 text-purple-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400">{t('dashboard.teaching-hours')}</p>
+                      <p className="text-xl md:text-2xl font-bold text-orange-600">{currentStats.totalHours}</p>
+                      <p className="text-xs text-orange-600 flex items-center mt-1">
+                        <Clock className="h-3 w-3 mr-1" />
+                        Total semester
+                      </p>
+                    </div>
+                    <div className="p-2 md:p-3 bg-orange-100 dark:bg-orange-900/20 rounded-full">
+                      <Clock className="h-4 w-4 md:h-6 md:w-6 text-orange-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
 
         {/* Main Content */}
-        <Tabs defaultValue="assignments" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="assignments">Tugas</TabsTrigger>
-            <TabsTrigger value="classes">Kelas</TabsTrigger>
-            <TabsTrigger value="students">Siswa</TabsTrigger>
-            <TabsTrigger value="grades">Nilai</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="assignments" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Draft Tugas</CardTitle>
-                  <CardDescription>Tugas yang belum dipublikasi</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {draftAssignments.length === 0 ? (
-                    <div className="text-center py-8">
-                      <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-500">Tidak ada draft tugas</p>
-                      <Link href="/assignments/create">
-                        <Button className="mt-4" size="sm">
-                          <Plus className="h-4 w-4 mr-2" />
-                          Buat Tugas Baru
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+          {/* Left Column - Recommendations & Features */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Personalized Recommendations */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2 text-lg md:text-xl">
+                  <Sparkles className="h-5 w-5 text-yellow-500" />
+                  <span>{t('dashboard.personalized-recommendations')}</span>
+                </CardTitle>
+                <CardDescription className="text-sm md:text-base">{t('dashboard.recommendations.subtitle')}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {currentRecommendations.map((item, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 md:p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">{item.icon}</div>
+                        <div className="flex-1">
+                          <h4 className="font-medium text-sm md:text-base">{item.title}</h4>
+                          <div className="flex flex-col items-start space-x-2 text-xs md:text-sm sm:flex-row sm:items-center text-gray-600 dark:text-gray-400">
+                            <Badge variant="secondary">{item.type}</Badge>
+                            <span className="hidden sm:block">•</span>
+                            <span className="py-1">{item.duration}</span>
+                            <span className="hidden sm:block">•</span>
+                            <Badge variant="outline">{item.level}</Badge>
+                          </div>
+                        </div>
+                      </div>
+                      <Link href={item.url}>
+                        <Button size="sm">
+                          {t('common.start')}
+                          <ChevronRight className="h-4 w-4" />
                         </Button>
                       </Link>
                     </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {draftAssignments.map((assignment) => (
-                        <div key={assignment.id} className="flex items-center justify-between p-4 border rounded-lg">
-                          <div className="flex-1">
-                            <h3 className="font-medium">{assignment.title}</h3>
-                            <p className="text-sm text-gray-600 mt-1">{assignment.description}</p>
-                            <div className="flex items-center mt-2 space-x-2">
-                              <Badge variant="secondary">Draft</Badge>
-                              {assignment.subjects && <Badge variant="outline">{assignment.subjects.nama_mata_pelajaran}</Badge>}
-                            </div>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Button size="sm" variant="outline">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Tugas Aktif</CardTitle>
-                  <CardDescription>Tugas yang sudah dipublikasi</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {publishedAssignments.length === 0 ? (
-                    <div className="text-center py-8">
-                      <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-500">Tidak ada tugas aktif</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {publishedAssignments.slice(0, 5).map((assignment) => (
-                        <div key={assignment.id} className="flex items-center justify-between p-4 border rounded-lg">
-                          <div className="flex-1">
-                            <h3 className="font-medium">{assignment.title}</h3>
-                            <p className="text-sm text-gray-600 mt-1">{assignment.description}</p>
-                            <div className="flex items-center mt-2 space-x-2">
-                              <Badge variant="default">Aktif</Badge>
-                              {assignment.subjects && <Badge variant="outline">{assignment.subjects.nama_mata_pelajaran}</Badge>}
-                              {assignment.due_date && (
-                                <div className="flex items-center text-sm text-gray-500">
-                                  <Calendar className="h-4 w-4 mr-1" />
-                                  {new Date(assignment.due_date).toLocaleDateString('id-ID')}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Button size="sm" variant="outline">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="classes" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Daftar Kelas</CardTitle>
-                <CardDescription>Semua kelas yang tersedia di sekolah</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {data.classes.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500">Tidak ada data kelas</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {data.classes.map((cls) => (
-                      <div key={cls.id} className="p-4 border rounded-lg">
-                        <h3 className="font-medium">{cls.nama_kelas}</h3>
-                        <p className="text-sm text-gray-600">Tingkat: {cls.tingkat}</p>
-                        <p className="text-sm text-gray-600">Jenjang: {cls.jenjang}</p>
-                        <p className="text-sm text-gray-600">Tahun Ajaran: {cls.tahun_ajaran}</p>
-                        <p className="text-sm text-gray-600">Kapasitas: {cls.kapasitas}</p>
-                        <div className="flex items-center justify-between mt-4">
-                          <Badge variant={cls.status === 'active' ? 'default' : 'secondary'}>{cls.status === 'active' ? 'Aktif' : 'Tidak Aktif'}</Badge>
-                          <Button size="sm" variant="outline">
-                            Kelola
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                  ))}
+                </div>
               </CardContent>
             </Card>
-          </TabsContent>
 
-          <TabsContent value="students" className="space-y-6">
+            {/* Core Features */}
             <Card>
               <CardHeader>
-                <CardTitle>Daftar Siswa</CardTitle>
-                <CardDescription>Semua siswa yang terdaftar</CardDescription>
+                <CardTitle className="text-lg md:text-xl">{t('dashboard.core-features')}</CardTitle>
+                <CardDescription className="text-sm md:text-base">{t('dashboard.features.subtitle')}</CardDescription>
               </CardHeader>
               <CardContent>
-                {data.students.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500">Belum ada siswa</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {data.students.slice(0, 10).map((student) => (
-                      <div key={student.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex-1">
-                          <h3 className="font-medium">{student.profiles?.full_name || 'Nama tidak tersedia'}</h3>
-                          <p className="text-sm text-gray-600">ID Siswa: {student.student_id}</p>
-                          <p className="text-sm text-gray-600">Email: {student.profiles?.email || 'Email tidak tersedia'}</p>
-                          <Badge variant={student.status === 'active' ? 'default' : 'secondary'} className="mt-2">
-                            {student.status === 'active' ? 'Aktif' : 'Tidak Aktif'}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Button size="sm" variant="outline">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </div>
+                <Tabs defaultValue="content-generator" className="w-full">
+                  <TabsList className="grid w-full h-full grid-cols-2 lg:grid-cols-4">
+                    <TabsTrigger value="content-generator" className="text-xs">
+                      {t('nav.content-generator')}
+                    </TabsTrigger>
+                    <TabsTrigger value="adaptive-learning" className="text-xs">
+                      Adaptive Path
+                    </TabsTrigger>
+                    <TabsTrigger value="assessment" className="text-xs">
+                      Assessment
+                    </TabsTrigger>
+                    <TabsTrigger value="analytics" className="text-xs">
+                      {t('nav.analytics')}
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="content-generator" className="space-y-4">
+                    <div className="p-4 border rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+                      <h4 className="font-semibold mb-2 flex items-center">
+                        <Brain className="h-4 w-4 mr-2 text-blue-600" />
+                        {t('nav.content-generator')}
+                      </h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Buat materi ajar otomatis sesuai kurikulum dengan AI</p>
+                      <div className="bg-white dark:bg-card p-3 rounded border dark:border-gray-700 text-sm">
+                        <strong>Contoh:</strong> Input "Fotosintesis" → AI generate PPT, video pendek, dan 10 soal pilihan ganda
                       </div>
-                    ))}
-                  </div>
-                )}
+                      <Link href="/content-generator">
+                        <Button className="mt-3" size="sm">
+                          <Zap className="h-4 w-4 mr-2" />
+                          Coba Sekarang
+                        </Button>
+                      </Link>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="adaptive-learning" className="space-y-4">
+                    <div className="p-4 border rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
+                      <h4 className="font-semibold mb-2 flex items-center">
+                        <TrendingUp className="h-4 w-4 mr-2 text-green-600" />
+                        Adaptive Learning Path
+                      </h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Jalur belajar dinamis yang menyesuaikan dengan performa</p>
+                      <div className="bg-white dark:bg-card p-3 rounded border dark:border-gray-700 text-sm">
+                        <strong>Contoh:</strong> Salah trigonometri → sistem turunkan level + rekomendasikan video tutorial
+                      </div>
+                      <Link href="/virtual-tutor">
+                        <Button className="mt-3" size="sm">
+                          <Target className="h-4 w-4 mr-2" />
+                          Lihat Path Saya
+                        </Button>
+                      </Link>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="assessment" className="space-y-4">
+                    <div className="p-4 border rounded-lg bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20">
+                      <h4 className="font-semibold mb-2 flex items-center">
+                        <Mic className="h-4 w-4 mr-2 text-purple-600" />
+                        Automated Assessment
+                      </h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">AI analisis jawaban esai/lisan dengan NLP</p>
+                      <div className="bg-white dark:bg-card p-3 rounded border dark:border-gray-700 text-sm">
+                        <strong>Contoh:</strong> Rekam jawaban sejarah → AI beri nilai + feedback tertulis
+                      </div>
+                      <Link href="/virtual-tutor">
+                        <Button className="mt-3" size="sm">
+                          <FileText className="h-4 w-4 mr-2" />
+                          Mulai Assessment
+                        </Button>
+                      </Link>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="analytics" className="space-y-4">
+                    <div className="p-4 border rounded-lg bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20">
+                      <h4 className="font-semibold mb-2 flex items-center">
+                        <BarChart3 className="h-4 w-4 mr-2 text-orange-600" />
+                        {t('nav.analytics')}
+                      </h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Dashboard untuk memantau perkembangan belajar</p>
+                      <div className="bg-white dark:bg-card p-3 rounded border dark:border-gray-700 text-sm">
+                        <strong>Contoh:</strong> Grafik area lemah siswa: "Aljabar perlu lebih banyak latihan"
+                      </div>
+                      <Link href="/analytics">
+                        <Button className="mt-3" size="sm">
+                          <BarChart3 className="h-4 w-4 mr-2" />
+                          Buka Analytics
+                        </Button>
+                      </Link>
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
-          </TabsContent>
+          </div>
 
-          <TabsContent value="grades" className="space-y-6">
+          {/* Right Column - Virtual Tutor & Progress */}
+          <div className="space-y-6">
+            {/* Virtual Tutor */}
             <Card>
               <CardHeader>
-                <CardTitle>Nilai Terbaru</CardTitle>
-                <CardDescription>Nilai yang telah Anda berikan</CardDescription>
+                <CardTitle className="flex items-center space-x-2 text-lg">
+                  <MessageCircle className="h-5 w-5 text-blue-500" />
+                  <span>{t('dashboard.virtual-tutor')}</span>
+                </CardTitle>
+                <CardDescription className="text-sm">{t('dashboard.tutor.subtitle')}</CardDescription>
               </CardHeader>
               <CardContent>
-                {data.grades.length === 0 ? (
-                  <div className="text-center py-8">
-                    <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500">Belum ada nilai yang diberikan</p>
+                <div className="space-y-3">
+                  <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                    <p className="text-sm">
+                      <strong>Siswa:</strong> "Apa itu hukum Newton?"
+                    </p>
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    {data.grades.slice(0, 10).map((grade) => (
-                      <div key={grade.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex-1">
-                          <h3 className="font-medium">{grade.assignments?.title || grade.subjects?.nama_mata_pelajaran}</h3>
-                          <p className="text-sm text-gray-600">Siswa: {grade.students?.profiles?.full_name || 'Nama tidak tersedia'}</p>
-                          <div className="flex items-center mt-2 space-x-4">
-                            {grade.subjects && <Badge variant="outline">{grade.subjects.nama_mata_pelajaran}</Badge>}
-                            <Badge variant="outline">{grade.grade_type}</Badge>
-                          </div>
-                          {grade.comments && <p className="text-sm text-gray-600 mt-2">{grade.comments}</p>}
-                        </div>
-                        <div className="text-right">
-                          <div className="text-2xl font-bold">
-                            {grade.score}/{grade.max_score}
-                          </div>
-                          <div className="text-sm text-gray-500">{((grade.score / grade.max_score) * 100).toFixed(1)}%</div>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="bg-blue-100 dark:bg-blue-900/20 p-3 rounded-lg">
+                    <p className="text-sm">
+                      <strong>AI Tutor:</strong> "Hukum Newton terdiri dari 3 hukum dasar tentang gerak. Mari saya jelaskan dengan animasi interaktif..."
+                    </p>
                   </div>
-                )}
+                  <Link href="/virtual-tutor">
+                    <Button className="w-full">
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Chat dengan AI Tutor
+                    </Button>
+                  </Link>
+                </div>
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+
+            {/* Learning Progress */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">{t('dashboard.learning-progress')}</CardTitle>
+                <CardDescription className="text-sm">{t('dashboard.progress.subtitle')}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {learningProgress.map((subject, index) => (
+                  <div key={index}>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span>{t(`subject.${subject.subject.toLowerCase()}`)}</span>
+                      <span>{subject.progress}%</span>
+                    </div>
+                    <Progress value={subject.progress} className="h-2" />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions - Simplified */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">{t('dashboard.quick-actions')}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Link href="/content-generator">
+                  <Button variant="outline" className="w-full justify-start bg-transparent">
+                    <Brain className="h-4 w-4 mr-2" />
+                    {t('content-generator.generate')}
+                  </Button>
+                </Link>
+                <Link href="/analytics">
+                  <Button variant="outline" className="w-full justify-start bg-transparent">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    {t('common.open')} {t('nav.analytics')}
+                  </Button>
+                </Link>
+                <Link href="/virtual-tutor">
+                  <Button variant="outline" className="w-full justify-start bg-transparent">
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    {t('dashboard.virtual-tutor')}
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

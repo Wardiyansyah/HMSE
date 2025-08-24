@@ -16,24 +16,21 @@ import { Label } from '@/components/ui/label';
 import { RefreshCw, Send } from 'lucide-react';
 import { Sparkles, Brain, ChevronDown, ChevronUp, Lightbulb, BookOpen, Calculator, Beaker, Globe, History, User, ImageIcon, FileText } from 'lucide-react';
 
-// --- Bagian ini dihapus: Komponen ApiKeySetup ---
-// Hapus seluruh blok kode function ApiKeySetup(...) { ... }
-
-// Sesuaikan cara inisialisasi API Key
-// Langsung ambil dari environment variable
 const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
 
-const openai = (modelName: string) =>
-  openaiBase({
-    model: modelName,
-    ...(NEXT_PUBLIC_OPENAI_API_KEY ? { apiKey: NEXT_PUBLIC_OPENAI_API_KEY } : {}),
-  });
+// Tambahkan pengecekan agar API key tidak undefined/null
+const openai = (modelId: string) => {
+  if (!OPENAI_API_KEY) {
+    return null;
+  }
+  return openaiBase(modelId as any, { apiKey: OPENAI_API_KEY });
+};
 
 interface Message {
   id: string;
   type: 'user' | 'ai';
   content: string;
-  timestamp: Date;
+  timestamp: string; // ubah ke string
   isStreaming?: boolean;
 }
 
@@ -46,7 +43,7 @@ export default function VirtualTutor() {
       content: `Halo ${
         user?.name || 'Siswa'
       }! 👋 Saya AI Tutor EduGenAI, siap membantu Anda belajar dengan cara yang menyenangkan dan efektif!\n\n🎯 Saya bisa membantu Anda dengan:\n• Penjelasan konsep dari berbagai mata pelajaran\n• Pemecahan soal step-by-step\n• Tips dan strategi belajar\n• Persiapan ujian dan tugas\n\nSilakan ajukan pertanyaan atau pilih topik dari menu di samping. Mari kita mulai belajar! 🚀`,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(), // gunakan ISO string
     },
   ]);
   const [inputMessage, setInputMessage] = useState('');
@@ -107,12 +104,13 @@ export default function VirtualTutor() {
 
   const handleSendMessage = async (content: string) => {
     if (!content.trim()) return;
+    console.log('Mengirim pesan:', content); // debug
 
     const userMessage: Message = {
       id: Date.now().toString(),
       type: 'user',
       content,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(), // gunakan ISO string
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -124,7 +122,7 @@ export default function VirtualTutor() {
       id: aiMessageId,
       type: 'ai',
       content: '',
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(), // gunakan ISO string
       isStreaming: true,
     };
 
@@ -149,8 +147,10 @@ export default function VirtualTutor() {
     }
 
     try {
+      const openaiModel = openai('gpt-4o');
+      if (!openaiModel) throw new Error('API key tidak ditemukan');
       const result = await streamText({
-        model: openai('gpt-4o-mini'),
+        model: openaiModel,
         system: `Anda adalah AI Tutor EduGenAI, asisten pembelajaran cerdas untuk siswa Indonesia. 
 
 KARAKTERISTIK ANDA:
@@ -294,7 +294,7 @@ Silakan coba lagi atau ajukan pertanyaan lain. Saya siap membantu! 😊`;
                               {message.isStreaming && <span className="inline-block w-2 h-4 bg-gray-400 dark:bg-gray-500 ml-1 animate-pulse"></span>}
                             </div>
                             <div className={`text-xs mt-2 ${message.type === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
-                              {message.timestamp.toLocaleTimeString('id-ID', {
+                              {new Date(message.timestamp).toLocaleTimeString('id-ID', {
                                 hour: '2-digit',
                                 minute: '2-digit',
                               })}

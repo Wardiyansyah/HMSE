@@ -42,7 +42,7 @@ export const useAppStore = create<AppState>()(
     (set, get) => ({
       user: {
         id: '1',
-        name: 'Ahmad Rizki',
+        name: 'Ahmad Rizk',
         email: 'ahmad.rizki@example.com',
         role: 'student',
         preferences: {

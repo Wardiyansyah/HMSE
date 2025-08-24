@@ -31,7 +31,7 @@ export function NavigationHeaderGuest() {
                 <Brain className="h-5 w-5 text-white" />
               </div>
               <div className="hidden sm:block">
-                <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">EduGenAI</h2>
+                <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">InsanAI</h2>
                 <p className="text-xs text-gray-600">AI Education Platform</p>
               </div>
             </Link>
@@ -85,8 +85,8 @@ export function NavigationHeaderGuest() {
 
             {/* Mobile Menu */}
             {/* <div className="md:hidden"> */}
-              {/* <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}> */}
-                {/* <SheetTrigger asChild>
+            {/* <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}> */}
+            {/* <SheetTrigger asChild>
                   <Button variant="outline" size="icon">
                     <Menu className="h-4 w-4" />
                   </Button>
@@ -100,8 +100,8 @@ export function NavigationHeaderGuest() {
                     <SheetDescription>Menu navigasi dan pengaturan</SheetDescription>
                   </SheetHeader>
                   <div className="mt-6 space-y-4"> */}
-                    {/* User Info */}
-                    {/* <div className="bg-gray-50 p-4 rounded-lg">
+            {/* User Info */}
+            {/* <div className="bg-gray-50 p-4 rounded-lg">
                       <div className="flex items-center space-x-3">
                         <Avatar className="h-12 w-12">
                           <AvatarImage src="/placeholder.svg?height=48&width=48" />
@@ -122,8 +122,8 @@ export function NavigationHeaderGuest() {
                       </div>
                     </div> */}
 
-                    {/* Settings */}
-                    {/* <div className="border-t pt-4">
+            {/* Settings */}
+            {/* <div className="border-t pt-4">
                       <Link href="/settings" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-colors">
                         <div className="p-1.5 bg-white rounded-md shadow-sm">
                           <Settings className="h-4 w-4" />
@@ -134,9 +134,9 @@ export function NavigationHeaderGuest() {
                         </div>
                       </Link>
                     </div> */}
-                  {/* </div>
+            {/* </div>
                 </SheetContent> */}
-              {/* </Sheet> */}
+            {/* </Sheet> */}
             {/* </div> */}
           </div>
         </div>

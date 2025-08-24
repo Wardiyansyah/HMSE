@@ -1,18 +1,18 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { Label } from "@/components/ui/label"
-import { Progress } from "@/components/ui/progress"
-import { useAppStore } from "@/lib/store"
-import { NavigationHeader } from "@/components/navigation-header"
-import { searchYouTubeVideos, type YouTubeVideo, type SearchParams } from "@/lib/youtube-api"
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
+import { useAppStore } from '@/lib/store';
+import { NavigationHeader } from '@/components/navigation-header-student';
+import { searchYouTubeVideos, type YouTubeVideo, type SearchParams } from '@/lib/youtube-api';
 import {
   RefreshCw,
   Sparkles,
@@ -37,116 +37,116 @@ import {
   Youtube,
   Settings,
   AlertCircle,
-} from "lucide-react"
+} from 'lucide-react';
 
 interface GeneratedContent {
-  type: "presentation" | "quiz" | "material" | "video" | "package"
-  title: string
-  content: any
-  timestamp: Date
-  status: "generating" | "completed" | "error"
-  progress: number
-  youtubeVideos?: YouTubeVideo[]
+  type: 'presentation' | 'quiz' | 'material' | 'video' | 'package';
+  title: string;
+  content: any;
+  timestamp: Date;
+  status: 'generating' | 'completed' | 'error';
+  progress: number;
+  youtubeVideos?: YouTubeVideo[];
 }
 
 interface ContentType {
-  id: string
-  title: string
-  description: string
-  icon: React.ReactNode
-  color: string
-  features: string[]
-  estimatedTime: string
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  features: string[];
+  estimatedTime: string;
 }
 
 const contentTypes: ContentType[] = [
   {
-    id: "package",
-    title: "Paket Lengkap",
-    description: "PPT + Video + Quiz + Materi",
+    id: 'package',
+    title: 'Paket Lengkap',
+    description: 'PPT + Video + Quiz + Materi',
     icon: <Sparkles className="h-6 w-6" />,
-    color: "from-purple-500 to-pink-500",
-    features: ["Presentasi PowerPoint", "Video Pembelajaran", "Kuis Interaktif", "Materi Bacaan"],
-    estimatedTime: "5-8 menit",
+    color: 'from-purple-500 to-pink-500',
+    features: ['Presentasi PowerPoint', 'Video Pembelajaran', 'Kuis Interaktif', 'Materi Bacaan'],
+    estimatedTime: '5-8 menit',
   },
   {
-    id: "presentation",
-    title: "Presentasi",
-    description: "Slide PowerPoint interaktif",
+    id: 'presentation',
+    title: 'Presentasi',
+    description: 'Slide PowerPoint interaktif',
     icon: <PresentationChart className="h-6 w-6" />,
-    color: "from-blue-500 to-cyan-500",
-    features: ["10-15 Slide", "Animasi Menarik", "Template Modern"],
-    estimatedTime: "2-3 menit",
+    color: 'from-blue-500 to-cyan-500',
+    features: ['10-15 Slide', 'Animasi Menarik', 'Template Modern'],
+    estimatedTime: '2-3 menit',
   },
   {
-    id: "video",
-    title: "Video Pembelajaran",
-    description: "Video edukatif dari YouTube",
+    id: 'video',
+    title: 'Video Pembelajaran',
+    description: 'Video edukatif dari YouTube',
     icon: <Video className="h-6 w-6" />,
-    color: "from-red-500 to-pink-500",
-    features: ["Video Berkualitas Tinggi", "Dari Channel Terpercaya", "Durasi Optimal", "Subtitle Indonesia"],
-    estimatedTime: "3-5 menit",
+    color: 'from-red-500 to-pink-500',
+    features: ['Video Berkualitas Tinggi', 'Dari Channel Terpercaya', 'Durasi Optimal', 'Subtitle Indonesia'],
+    estimatedTime: '3-5 menit',
   },
   {
-    id: "quiz",
-    title: "Kuis Interaktif",
-    description: "Soal pilihan ganda + essay",
+    id: 'quiz',
+    title: 'Kuis Interaktif',
+    description: 'Soal pilihan ganda + essay',
     icon: <HelpCircle className="h-6 w-6" />,
-    color: "from-orange-500 to-red-500",
-    features: ["10-20 Soal", "Pembahasan Lengkap", "Skor Otomatis"],
-    estimatedTime: "1-2 menit",
+    color: 'from-orange-500 to-red-500',
+    features: ['10-20 Soal', 'Pembahasan Lengkap', 'Skor Otomatis'],
+    estimatedTime: '1-2 menit',
   },
   {
-    id: "material",
-    title: "Materi Bacaan",
-    description: "Dokumen pembelajaran lengkap",
+    id: 'material',
+    title: 'Materi Bacaan',
+    description: 'Dokumen pembelajaran lengkap',
     icon: <BookOpen className="h-6 w-6" />,
-    color: "from-indigo-500 to-purple-500",
-    features: ["Format PDF", "Ilustrasi", "Ringkasan"],
-    estimatedTime: "2-4 menit",
+    color: 'from-indigo-500 to-purple-500',
+    features: ['Format PDF', 'Ilustrasi', 'Ringkasan'],
+    estimatedTime: '2-4 menit',
   },
-]
+];
 
 const subjects = [
-  { value: "matematika", label: "Matematika", icon: "🔢" },
-  { value: "fisika", label: "Fisika", icon: "⚛️" },
-  { value: "kimia", label: "Kimia", icon: "🧪" },
-  { value: "biologi", label: "Biologi", icon: "🧬" },
-  { value: "sejarah", label: "Sejarah", icon: "📜" },
-  { value: "geografi", label: "Geografi", icon: "🌍" },
-  { value: "bahasa-indonesia", label: "Bahasa Indonesia", icon: "📚" },
-  { value: "bahasa-inggris", label: "Bahasa Inggris", icon: "🇺🇸" },
-  { value: "ekonomi", label: "Ekonomi", icon: "💰" },
-  { value: "sosiologi", label: "Sosiologi", icon: "👥" },
-]
+  { value: 'matematika', label: 'Matematika', icon: '🔢' },
+  { value: 'fisika', label: 'Fisika', icon: '⚛️' },
+  { value: 'kimia', label: 'Kimia', icon: '🧪' },
+  { value: 'biologi', label: 'Biologi', icon: '🧬' },
+  { value: 'sejarah', label: 'Sejarah', icon: '📜' },
+  { value: 'geografi', label: 'Geografi', icon: '🌍' },
+  { value: 'bahasa-indonesia', label: 'Bahasa Indonesia', icon: '📚' },
+  { value: 'bahasa-inggris', label: 'Bahasa Inggris', icon: '🇺🇸' },
+  { value: 'ekonomi', label: 'Ekonomi', icon: '💰' },
+  { value: 'sosiologi', label: 'Sosiologi', icon: '👥' },
+];
 
 const educationLevels = [
-  { value: "sd", label: "Sekolah Dasar", description: "Kelas 1-6", icon: "🎒" },
-  { value: "smp", label: "SMP", description: "Kelas 7-9", icon: "📖" },
-  { value: "sma", label: "SMA", description: "Kelas 10-12", icon: "🎓" },
-]
+  { value: 'sd', label: 'Sekolah Dasar', description: 'Kelas 1-6', icon: '🎒' },
+  { value: 'smp', label: 'SMP', description: 'Kelas 7-9', icon: '📖' },
+  { value: 'sma', label: 'SMA', description: 'Kelas 10-12', icon: '🎓' },
+];
 
 function ApiKeySetup({ onClose }: { onClose: () => void }) {
-  const [tempApiKey, setTempApiKey] = useState("")
-  const [isValidating, setIsValidating] = useState(false)
+  const [tempApiKey, setTempApiKey] = useState('');
+  const [isValidating, setIsValidating] = useState(false);
 
   const handleValidateKey = async () => {
-    if (!tempApiKey.trim()) return
+    if (!tempApiKey.trim()) return;
 
-    setIsValidating(true)
+    setIsValidating(true);
     try {
-      if (tempApiKey.startsWith("sk-") && tempApiKey.length > 20) {
-        sessionStorage.setItem("temp_openai_key", tempApiKey)
-        onClose()
-        window.location.reload()
+      if (tempApiKey.startsWith('sk-') && tempApiKey.length > 20) {
+        sessionStorage.setItem('temp_openai_key', tempApiKey);
+        onClose();
+        window.location.reload();
       } else {
-        alert("Format API key tidak valid. Pastikan dimulai dengan 'sk-' dan memiliki panjang yang sesuai.")
+        alert("Format API key tidak valid. Pastikan dimulai dengan 'sk-' dan memiliki panjang yang sesuai.");
       }
     } catch (error) {
-      alert("Terjadi kesalahan saat memvalidasi API key.")
+      alert('Terjadi kesalahan saat memvalidasi API key.');
     }
-    setIsValidating(false)
-  }
+    setIsValidating(false);
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -163,13 +163,8 @@ function ApiKeySetup({ onClose }: { onClose: () => void }) {
             <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">📋 Cara mendapatkan API Key:</h4>
             <ol className="text-sm text-blue-700 dark:text-blue-400 space-y-1 list-decimal list-inside">
               <li>
-                Kunjungi{" "}
-                <a
-                  href="https://platform.openai.com/api-keys"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline font-medium"
-                >
+                Kunjungi{' '}
+                <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="underline font-medium">
                   platform.openai.com/api-keys
                 </a>
               </li>
@@ -182,14 +177,7 @@ function ApiKeySetup({ onClose }: { onClose: () => void }) {
 
           <div className="space-y-2">
             <Label htmlFor="apikey">OpenAI API Key</Label>
-            <Input
-              id="apikey"
-              type="password"
-              placeholder="sk-..."
-              value={tempApiKey}
-              onChange={(e) => setTempApiKey(e.target.value)}
-              className="font-mono text-sm"
-            />
+            <Input id="apikey" type="password" placeholder="sk-..." value={tempApiKey} onChange={(e) => setTempApiKey(e.target.value)} className="font-mono text-sm" />
           </div>
 
           <div className="flex space-x-2">
@@ -213,118 +201,118 @@ function ApiKeySetup({ onClose }: { onClose: () => void }) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 
 export default function ContentGenerator() {
-  const { user, startSession, endSession } = useAppStore()
-  const [currentStep, setCurrentStep] = useState(1)
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [generatedContent, setGeneratedContent] = useState<GeneratedContent[]>([])
-  const [generationProgress, setGenerationProgress] = useState(0)
-  const [isSearchingVideos, setIsSearchingVideos] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { user, startSession, endSession } = useAppStore();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedContent, setGeneratedContent] = useState<GeneratedContent[]>([]);
+  const [generationProgress, setGenerationProgress] = useState(0);
+  const [isSearchingVideos, setIsSearchingVideos] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // API Key management
-  const [apiKey, setApiKey] = useState<string | null>(null)
-  const [showApiKeySetup, setShowApiKeySetup] = useState(false)
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  const [showApiKeySetup, setShowApiKeySetup] = useState(false);
 
   // Form states
-  const [subject, setSubject] = useState("")
-  const [topic, setTopic] = useState("")
-  const [level, setLevel] = useState("")
-  const [contentType, setContentType] = useState("")
-  const [additionalInstructions, setAdditionalInstructions] = useState("")
+  const [subject, setSubject] = useState('');
+  const [topic, setTopic] = useState('');
+  const [level, setLevel] = useState('');
+  const [contentType, setContentType] = useState('');
+  const [additionalInstructions, setAdditionalInstructions] = useState('');
 
   useEffect(() => {
-    startSession("Content Generator", "AI Content Creation")
+    startSession('Content Generator', 'AI Content Creation');
 
     // Check for API key
-    const envApiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY
-    const sessionApiKey = typeof window !== "undefined" ? sessionStorage.getItem("temp_openai_key") : null
+    const envApiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+    const sessionApiKey = typeof window !== 'undefined' ? sessionStorage.getItem('temp_openai_key') : null;
 
-    const currentApiKey = envApiKey || sessionApiKey
-    setApiKey(currentApiKey)
+    const currentApiKey = envApiKey || sessionApiKey;
+    setApiKey(currentApiKey);
 
     if (!currentApiKey) {
-      setShowApiKeySetup(true)
+      setShowApiKeySetup(true);
     }
 
-    return () => endSession()
-  }, [startSession, endSession])
+    return () => endSession();
+  }, [startSession, endSession]);
 
   const generateWithOpenAI = async (systemPrompt: string, userPrompt: string): Promise<string> => {
     if (!apiKey) {
-      throw new Error("API key tidak tersedia")
+      throw new Error('API key tidak tersedia');
     }
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: 'gpt-4o-mini',
         messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
         ],
         max_tokens: 2000,
         temperature: 0.7,
       }),
-    })
+    });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
+      const errorData = await response.json().catch(() => ({}));
 
       if (response.status === 401) {
-        throw new Error("API key tidak valid. Silakan periksa kembali API key Anda.")
+        throw new Error('API key tidak valid. Silakan periksa kembali API key Anda.');
       } else if (response.status === 429) {
-        throw new Error("Rate limit terlampaui. Silakan coba lagi dalam beberapa saat.")
+        throw new Error('Rate limit terlampaui. Silakan coba lagi dalam beberapa saat.');
       } else if (response.status === 402) {
-        throw new Error("Quota tidak mencukupi. Silakan tambahkan billing di akun OpenAI Anda.")
+        throw new Error('Quota tidak mencukupi. Silakan tambahkan billing di akun OpenAI Anda.');
       } else {
-        throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`)
+        throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
       }
     }
 
-    const data = await response.json()
-    return data.choices[0]?.message?.content || "Tidak ada respons dari AI"
-  }
+    const data = await response.json();
+    return data.choices[0]?.message?.content || 'Tidak ada respons dari AI';
+  };
 
   const searchYouTubeContent = async (): Promise<YouTubeVideo[]> => {
-    if (!topic.trim() || !subject || !level) return []
+    if (!topic.trim() || !subject || !level) return [];
 
-    setIsSearchingVideos(true)
+    setIsSearchingVideos(true);
     try {
       const searchParams: SearchParams = {
         category: subject,
         level: level,
         topic: topic,
         maxResults: 5,
-      }
+      };
 
-      const videos = await searchYouTubeVideos(searchParams)
-      return videos
+      const videos = await searchYouTubeVideos(searchParams);
+      return videos;
     } catch (error) {
-      console.error("Error searching YouTube videos:", error)
-      return []
+      console.error('Error searching YouTube videos:', error);
+      return [];
     } finally {
-      setIsSearchingVideos(false)
+      setIsSearchingVideos(false);
     }
-  }
+  };
 
   const generateAIContent = async (): Promise<any> => {
     if (!apiKey) {
-      throw new Error("API key tidak tersedia")
+      throw new Error('API key tidak tersedia');
     }
 
-    let systemPrompt = ""
-    let userPrompt = ""
+    let systemPrompt = '';
+    let userPrompt = '';
 
     switch (contentType) {
-      case "presentation":
+      case 'presentation':
         systemPrompt = `Anda adalah AI Content Generator untuk EduGenAI yang ahli dalam membuat presentasi pembelajaran.
 
 Tugas Anda adalah membuat presentasi pembelajaran yang komprehensif dalam format JSON dengan struktur berikut:
@@ -353,15 +341,15 @@ PEDOMAN:
 - Sertakan contoh praktis dan relevan
 - Berikan catatan presenter yang membantu
 - Fokus pada pembelajaran yang efektif
-- WAJIB berikan output dalam format JSON yang valid`
+- WAJIB berikan output dalam format JSON yang valid`;
 
         userPrompt = `Buatkan presentasi pembelajaran tentang "${topic}" untuk mata pelajaran ${subject} tingkat ${level}. 
-        ${additionalInstructions ? `Catatan tambahan: ${additionalInstructions}` : ""}
+        ${additionalInstructions ? `Catatan tambahan: ${additionalInstructions}` : ''}
         
-        Berikan output dalam format JSON yang valid.`
-        break
+        Berikan output dalam format JSON yang valid.`;
+        break;
 
-      case "quiz":
+      case 'quiz':
         systemPrompt = `Anda adalah AI Content Generator untuk EduGenAI yang ahli dalam membuat kuis pembelajaran.
 
 Tugas Anda adalah membuat kuis dalam format JSON dengan struktur berikut:
@@ -389,15 +377,15 @@ PEDOMAN:
 - Berikan penjelasan untuk setiap jawaban
 - Sesuaikan tingkat kesulitan dengan level siswa
 - Fokus pada pemahaman konsep, bukan hafalan
-- WAJIB berikan output dalam format JSON yang valid`
+- WAJIB berikan output dalam format JSON yang valid`;
 
         userPrompt = `Buatkan kuis tentang "${topic}" untuk mata pelajaran ${subject} tingkat ${level}.
-        ${additionalInstructions ? `Catatan tambahan: ${additionalInstructions}` : ""}
+        ${additionalInstructions ? `Catatan tambahan: ${additionalInstructions}` : ''}
         
-        Berikan output dalam format JSON yang valid.`
-        break
+        Berikan output dalam format JSON yang valid.`;
+        break;
 
-      case "material":
+      case 'material':
         systemPrompt = `Anda adalah AI Content Generator untuk EduGenAI yang ahli dalam membuat materi pembelajaran.
 
 Tugas Anda adalah membuat materi pembelajaran komprehensif dalam format JSON:
@@ -425,13 +413,13 @@ PEDOMAN:
 - Sertakan contoh praktis dan relevan
 - Berikan ringkasan yang komprehensif
 - Tambahkan latihan untuk pemahaman
-- WAJIB berikan output dalam format JSON yang valid`
+- WAJIB berikan output dalam format JSON yang valid`;
 
         userPrompt = `Buatkan materi pembelajaran tentang "${topic}" untuk mata pelajaran ${subject} tingkat ${level}.
-        ${additionalInstructions ? `Catatan tambahan: ${additionalInstructions}` : ""}
+        ${additionalInstructions ? `Catatan tambahan: ${additionalInstructions}` : ''}
         
-        Berikan output dalam format JSON yang valid.`
-        break
+        Berikan output dalam format JSON yang valid.`;
+        break;
 
       default:
         // For video and package, create a general content structure
@@ -451,53 +439,53 @@ PEDOMAN:
 - Sesuaikan dengan level pendidikan
 - Gunakan bahasa yang mudah dipahami
 - Fokus pada tujuan pembelajaran yang jelas
-- WAJIB berikan output dalam format JSON yang valid`
+- WAJIB berikan output dalam format JSON yang valid`;
 
         userPrompt = `Buatkan struktur konten pembelajaran tentang "${topic}" untuk mata pelajaran ${subject} tingkat ${level}.
-        ${additionalInstructions ? `Catatan tambahan: ${additionalInstructions}` : ""}
+        ${additionalInstructions ? `Catatan tambahan: ${additionalInstructions}` : ''}
         
-        Berikan output dalam format JSON yang valid.`
+        Berikan output dalam format JSON yang valid.`;
     }
 
-    const result = await generateWithOpenAI(systemPrompt, userPrompt)
-    return JSON.parse(result)
-  }
+    const result = await generateWithOpenAI(systemPrompt, userPrompt);
+    return JSON.parse(result);
+  };
 
   const simulateGeneration = async () => {
-    if (!topic.trim() || !subject || !level || !contentType) return
+    if (!topic.trim() || !subject || !level || !contentType) return;
 
     if (!apiKey) {
-      setShowApiKeySetup(true)
-      return
+      setShowApiKeySetup(true);
+      return;
     }
 
-    setIsGenerating(true)
-    setGenerationProgress(0)
-    setError(null)
+    setIsGenerating(true);
+    setGenerationProgress(0);
+    setError(null);
 
     try {
       // Step 1: Initial setup
-      await new Promise((resolve) => setTimeout(resolve, 800))
-      setGenerationProgress(20)
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      setGenerationProgress(20);
 
       // Step 2: Search YouTube videos if content type is video or package
-      let youtubeVideos: YouTubeVideo[] = []
-      if (contentType === "video" || contentType === "package") {
-        setGenerationProgress(40)
-        youtubeVideos = await searchYouTubeContent()
-        setGenerationProgress(60)
+      let youtubeVideos: YouTubeVideo[] = [];
+      if (contentType === 'video' || contentType === 'package') {
+        setGenerationProgress(40);
+        youtubeVideos = await searchYouTubeContent();
+        setGenerationProgress(60);
       } else {
-        setGenerationProgress(60)
+        setGenerationProgress(60);
       }
 
       // Step 3: Generate AI content
-      setGenerationProgress(70)
-      const aiContent = await generateAIContent()
-      setGenerationProgress(90)
+      setGenerationProgress(70);
+      const aiContent = await generateAIContent();
+      setGenerationProgress(90);
 
       // Step 4: Finalize
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      setGenerationProgress(100)
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setGenerationProgress(100);
 
       // Create final content
       const newContent: GeneratedContent = {
@@ -505,71 +493,71 @@ PEDOMAN:
         title: aiContent.title || `${getContentTypeTitle(contentType)}: ${topic}`,
         content: {
           ...aiContent,
-          estimatedTime: contentTypes.find((ct) => ct.id === contentType)?.estimatedTime || "3-5 menit",
+          estimatedTime: contentTypes.find((ct) => ct.id === contentType)?.estimatedTime || '3-5 menit',
           features: contentTypes.find((ct) => ct.id === contentType)?.features || [],
           videoCount: youtubeVideos.length,
           totalDuration: youtubeVideos.reduce((total, video) => {
-            const duration = video.duration.split(":")
-            return total + Number.parseInt(duration[0]) * 60 + Number.parseInt(duration[1])
+            const duration = video.duration.split(':');
+            return total + Number.parseInt(duration[0]) * 60 + Number.parseInt(duration[1]);
           }, 0),
           channels: [...new Set(youtubeVideos.map((v) => v.channelTitle))],
         },
         timestamp: new Date(),
-        status: "completed",
+        status: 'completed',
         progress: 100,
         youtubeVideos: youtubeVideos.length > 0 ? youtubeVideos : undefined,
-      }
+      };
 
-      setGeneratedContent((prev) => [newContent, ...prev])
+      setGeneratedContent((prev) => [newContent, ...prev]);
     } catch (error: any) {
-      console.error("Error generating content:", error)
-      setError(error.message || "Terjadi kesalahan saat membuat konten")
+      console.error('Error generating content:', error);
+      setError(error.message || 'Terjadi kesalahan saat membuat konten');
     } finally {
-      setIsGenerating(false)
-      setGenerationProgress(0)
+      setIsGenerating(false);
+      setGenerationProgress(0);
     }
-  }
+  };
 
   const getContentTypeTitle = (type: string) => {
-    const contentType = contentTypes.find((ct) => ct.id === type)
-    return contentType?.title || "Konten"
-  }
+    const contentType = contentTypes.find((ct) => ct.id === type);
+    return contentType?.title || 'Konten';
+  };
 
   const handleNext = () => {
     if (currentStep < 3) {
-      setCurrentStep(currentStep + 1)
+      setCurrentStep(currentStep + 1);
     } else {
-      simulateGeneration()
+      simulateGeneration();
     }
-  }
+  };
 
   const handleBack = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1)
+      setCurrentStep(currentStep - 1);
     }
-  }
+  };
 
   const canProceed = () => {
     switch (currentStep) {
       case 1:
-        return subject && level
+        return subject && level;
       case 2:
-        return topic.trim()
+        return topic.trim();
       case 3:
-        return contentType
+        return contentType;
       default:
-        return false
+        return false;
     }
-  }
+  };
 
   const formatDuration = (seconds: number): string => {
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
     if (hours > 0) {
-      return `${hours}j ${minutes}m`
+      return `${hours}j ${minutes}m`;
     }
-    return `${minutes}m`
-  }
+    return `${minutes}m`;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-900 dark:to-indigo-950">
@@ -585,12 +573,8 @@ PEDOMAN:
               <Brain className="h-5 w-5 text-purple-600" />
               <span className="text-sm font-medium">Powered by Advanced AI</span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-6">
-              AI Content Generator
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-              Buat materi pembelajaran berkualitas tinggi dalam hitungan menit dengan teknologi AI terdepan
-            </p>
+            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-6">AI Content Generator</h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">Buat materi pembelajaran berkualitas tinggi dalam hitungan menit dengan teknologi AI terdepan</p>
             <div className="flex flex-wrap justify-center gap-4 mb-8">
               <Badge variant="secondary" className="bg-purple-100 text-purple-800 px-4 py-2">
                 <Zap className="h-4 w-4 mr-2" />
@@ -637,36 +621,26 @@ PEDOMAN:
               <div key={step} className="flex items-center">
                 <div
                   className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all duration-300 ${
-                    currentStep >= step
-                      ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg"
-                      : "bg-gray-200 dark:bg-gray-700 text-gray-500"
+                    currentStep >= step ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg' : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
                   }`}
                 >
                   {currentStep > step ? <CheckCircle className="h-6 w-6" /> : step}
                 </div>
-                {step < 3 && (
-                  <div
-                    className={`h-1 w-24 md:w-32 mx-4 transition-all duration-300 ${
-                      currentStep > step
-                        ? "bg-gradient-to-r from-purple-500 to-blue-500"
-                        : "bg-gray-200 dark:bg-gray-700"
-                    }`}
-                  />
-                )}
+                {step < 3 && <div className={`h-1 w-24 md:w-32 mx-4 transition-all duration-300 ${currentStep > step ? 'bg-gradient-to-r from-purple-500 to-blue-500' : 'bg-gray-200 dark:bg-gray-700'}`} />}
               </div>
             ))}
           </div>
 
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-              {currentStep === 1 && "Pilih Mata Pelajaran & Level"}
-              {currentStep === 2 && "Tentukan Topik Pembelajaran"}
-              {currentStep === 3 && "Pilih Jenis Konten"}
+              {currentStep === 1 && 'Pilih Mata Pelajaran & Level'}
+              {currentStep === 2 && 'Tentukan Topik Pembelajaran'}
+              {currentStep === 3 && 'Pilih Jenis Konten'}
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
-              {currentStep === 1 && "Mulai dengan memilih mata pelajaran dan tingkat pendidikan"}
-              {currentStep === 2 && "Masukkan topik spesifik yang ingin Anda buat"}
-              {currentStep === 3 && "Pilih format konten yang diinginkan"}
+              {currentStep === 1 && 'Mulai dengan memilih mata pelajaran dan tingkat pendidikan'}
+              {currentStep === 2 && 'Masukkan topik spesifik yang ingin Anda buat'}
+              {currentStep === 3 && 'Pilih format konten yang diinginkan'}
             </p>
           </div>
         </div>
@@ -689,12 +663,8 @@ PEDOMAN:
                     {subjects.map((subj) => (
                       <Button
                         key={subj.value}
-                        variant={subject === subj.value ? "default" : "outline"}
-                        className={`h-20 flex-col space-y-2 transition-all duration-300 ${
-                          subject === subj.value
-                            ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg scale-105"
-                            : "hover:scale-105 hover:shadow-md"
-                        }`}
+                        variant={subject === subj.value ? 'default' : 'outline'}
+                        className={`h-20 flex-col space-y-2 transition-all duration-300 ${subject === subj.value ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg scale-105' : 'hover:scale-105 hover:shadow-md'}`}
                         onClick={() => setSubject(subj.value)}
                       >
                         <span className="text-2xl">{subj.icon}</span>
@@ -718,12 +688,8 @@ PEDOMAN:
                     {educationLevels.map((lvl) => (
                       <Button
                         key={lvl.value}
-                        variant={level === lvl.value ? "default" : "outline"}
-                        className={`h-24 flex-col space-y-2 transition-all duration-300 ${
-                          level === lvl.value
-                            ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg scale-105"
-                            : "hover:scale-105 hover:shadow-md"
-                        }`}
+                        variant={level === lvl.value ? 'default' : 'outline'}
+                        className={`h-24 flex-col space-y-2 transition-all duration-300 ${level === lvl.value ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg scale-105' : 'hover:scale-105 hover:shadow-md'}`}
                         onClick={() => setLevel(lvl.value)}
                       >
                         <span className="text-2xl">{lvl.icon}</span>
@@ -754,13 +720,7 @@ PEDOMAN:
                   <Label htmlFor="topic" className="text-lg font-medium">
                     Topik
                   </Label>
-                  <Input
-                    id="topic"
-                    placeholder="Contoh: Fotosintesis, Hukum Newton, Sejarah Kemerdekaan..."
-                    value={topic}
-                    onChange={(e) => setTopic(e.target.value)}
-                    className="h-14 text-lg"
-                  />
+                  <Input id="topic" placeholder="Contoh: Fotosintesis, Hukum Newton, Sejarah Kemerdekaan..." value={topic} onChange={(e) => setTopic(e.target.value)} className="h-14 text-lg" />
                 </div>
 
                 <div className="space-y-2">
@@ -802,9 +762,7 @@ PEDOMAN:
             <div className="space-y-8">
               <div className="text-center mb-8">
                 <h3 className="text-xl font-semibold mb-2">Pilih Jenis Konten</h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Setiap jenis konten memiliki keunggulan dan fitur yang berbeda
-                </p>
+                <p className="text-gray-600 dark:text-gray-400">Setiap jenis konten memiliki keunggulan dan fitur yang berbeda</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -812,9 +770,7 @@ PEDOMAN:
                   <Card
                     key={type.id}
                     className={`cursor-pointer transition-all duration-300 border-2 hover:shadow-xl hover:scale-105 ${
-                      contentType === type.id
-                        ? "border-purple-500 shadow-xl scale-105 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20"
-                        : "border-gray-200 dark:border-gray-700 hover:border-purple-300"
+                      contentType === type.id ? 'border-purple-500 shadow-xl scale-105 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20' : 'border-gray-200 dark:border-gray-700 hover:border-purple-300'
                     }`}
                     onClick={() => setContentType(type.id)}
                   >
@@ -845,7 +801,7 @@ PEDOMAN:
                             ))}
                           </ul>
                         </div>
-                        {(type.id === "video" || type.id === "package") && (
+                        {(type.id === 'video' || type.id === 'package') && (
                           <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-700">
                             <div className="flex items-center space-x-2 text-red-800 dark:text-red-300">
                               <Youtube className="h-4 w-4" />
@@ -877,7 +833,7 @@ PEDOMAN:
                     <p className="text-gray-600 dark:text-gray-400 mb-4">
                       Membuat {getContentTypeTitle(contentType).toLowerCase()} untuk "{topic}"
                     </p>
-                    {(contentType === "video" || contentType === "package") && isSearchingVideos && (
+                    {(contentType === 'video' || contentType === 'package') && isSearchingVideos && (
                       <div className="flex items-center justify-center space-x-2 text-red-600 dark:text-red-400 mb-2">
                         <Youtube className="h-4 w-4 animate-pulse" />
                         <span className="text-sm">Mencari video YouTube terkait...</span>
@@ -924,13 +880,11 @@ PEDOMAN:
                         </div>
 
                         {/* Video Content Stats */}
-                        {(content.type === "video" || content.type === "package") && content.youtubeVideos && (
+                        {(content.type === 'video' || content.type === 'package') && content.youtubeVideos && (
                           <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-700">
                             <div className="flex items-center space-x-2 mb-3">
                               <Youtube className="h-5 w-5 text-red-600" />
-                              <h4 className="font-semibold text-red-800 dark:text-red-300">
-                                Video Pembelajaran Ditemukan
-                              </h4>
+                              <h4 className="font-semibold text-red-800 dark:text-red-300">Video Pembelajaran Ditemukan</h4>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                               <div className="flex items-center space-x-2">
@@ -958,43 +912,27 @@ PEDOMAN:
                             </h4>
                             <div className="grid gap-4">
                               {content.youtubeVideos.map((video, videoIndex) => (
-                                <div
-                                  key={videoIndex}
-                                  className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-                                >
+                                <div key={videoIndex} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                                   <div className="flex space-x-4">
                                     <div className="relative flex-shrink-0">
-                                      <img
-                                        src={video.thumbnail || "/placeholder.svg"}
-                                        alt={video.title}
-                                        className="w-32 h-20 object-cover rounded-lg"
-                                      />
+                                      <img src={video.thumbnail || '/placeholder.svg'} alt={video.title} className="w-32 h-20 object-cover rounded-lg" />
                                       <div className="absolute inset-0 flex items-center justify-center">
                                         <div className="bg-black/70 rounded-full p-2">
                                           <Play className="h-4 w-4 text-white" />
                                         </div>
                                       </div>
-                                      <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
-                                        {video.duration}
-                                      </div>
+                                      <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">{video.duration}</div>
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <h5 className="font-medium text-sm mb-1 line-clamp-2">{video.title}</h5>
-                                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
-                                        {video.description}
-                                      </p>
+                                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">{video.description}</p>
                                       <div className="flex items-center justify-between text-xs text-gray-500">
                                         <span>{video.channelTitle}</span>
                                         <span>{video.viewCount} views</span>
                                       </div>
                                     </div>
                                     <div className="flex flex-col space-y-2">
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        className="text-red-600 border-red-200 hover:bg-red-50 bg-transparent"
-                                        onClick={() => window.open(video.url, "_blank")}
-                                      >
+                                      <Button size="sm" variant="outline" className="text-red-600 border-red-200 hover:bg-red-50 bg-transparent" onClick={() => window.open(video.url, '_blank')}>
                                         <ExternalLink className="h-3 w-3 mr-1" />
                                         Tonton
                                       </Button>
@@ -1035,12 +973,7 @@ PEDOMAN:
           {/* Navigation Buttons */}
           {!isGenerating && generatedContent.length === 0 && (
             <div className="flex justify-between items-center max-w-2xl mx-auto mt-12">
-              <Button
-                variant="outline"
-                onClick={handleBack}
-                disabled={currentStep === 1}
-                className="px-8 py-3 bg-transparent"
-              >
+              <Button variant="outline" onClick={handleBack} disabled={currentStep === 1} className="px-8 py-3 bg-transparent">
                 Kembali
               </Button>
               <div className="flex space-x-3">
@@ -1050,11 +983,7 @@ PEDOMAN:
                     Setup API Key
                   </Button>
                 )}
-                <Button
-                  onClick={handleNext}
-                  disabled={!canProceed() || !apiKey}
-                  className="px-8 py-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-                >
+                <Button onClick={handleNext} disabled={!canProceed() || !apiKey} className="px-8 py-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
                   {currentStep === 3 ? (
                     <>
                       <Sparkles className="h-4 w-4 mr-2" />
@@ -1077,14 +1006,14 @@ PEDOMAN:
               <Button
                 variant="outline"
                 onClick={() => {
-                  setCurrentStep(1)
-                  setGeneratedContent([])
-                  setSubject("")
-                  setTopic("")
-                  setLevel("")
-                  setContentType("")
-                  setAdditionalInstructions("")
-                  setError(null)
+                  setCurrentStep(1);
+                  setGeneratedContent([]);
+                  setSubject('');
+                  setTopic('');
+                  setLevel('');
+                  setContentType('');
+                  setAdditionalInstructions('');
+                  setError(null);
                 }}
                 className="px-8 py-3"
               >
@@ -1096,5 +1025,5 @@ PEDOMAN:
         </div>
       </div>
     </div>
-  )
+  );
 }

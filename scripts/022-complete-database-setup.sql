@@ -177,7 +177,7 @@ INSERT INTO profiles (id, email, username, password_hash, full_name, role, phone
 
 -- Teachers
 ('12923aca-bb13-4f41-b7f8-411c4b22c669', 'guru1@sekolah.com', 'guru1', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/VcSAg/9u.', 'Budi Santoso', 'teacher', '081234567891', 'active'),
-('1db422b0-b93a-4b2f-af69-a442eb95679e', 'guru2@sekolah.com', 'guru2', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/VcSAg/9u.', 'Siti Nurhaliza', 'teacher', '081234567892', 'active'),
+('1db422b0-b93a-4b2f-af69-a442eb95679e', 'guru2@sekolah.com', 'guru2', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/VcSAg/9u.', '', 'teacher', '081234567892', 'active'),
 ('2a8c69c7-1c8a-4452-9ca9-d04cf4301f61', 'guru3@sekolah.com', 'guru3', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/VcSAg/9u.', 'Ahmad Wijaya', 'teacher', '081234567893', 'active'),
 
 -- Students
