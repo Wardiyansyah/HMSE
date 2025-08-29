@@ -97,7 +97,6 @@ export default function LoginPage() {
             <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
               Daftar di sini
             </Link>
-            <p className="text-gray-400">sementara</p>
           </p>
         </div>
 
