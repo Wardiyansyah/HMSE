@@ -13,7 +13,7 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'InsanAI - Intelligent Assistant for Insan Pembangunan',
   description: 'Platform pembelajaran AI yang menghadirkan pengalaman belajar personal dan adaptif untuk semua kalangan',
-  generator: 'v0.dev',
+  generator: 'InsanPembangunanDev',
 };
 
 const menuItems = [
