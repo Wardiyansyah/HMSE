@@ -120,7 +120,7 @@ export function NavigationHeader() {
           <div className="flex items-center space-x-3">
             {/* User Info - Hidden on small screens */}
             <div className="hidden lg:block text-right">
-              <p className="text-sm font-medium">Samsudin</p>
+              <p className="text-sm font-medium">Jamaludin</p>
               <Badge variant="secondary" className="text-xs">
                 Siswa
               </Badge>
