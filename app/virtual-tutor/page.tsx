@@ -103,125 +103,60 @@ export default function VirtualTutor() {
   }, [messages]);
 
   const handleSendMessage = async (content: string) => {
-    if (!content.trim()) return;
-    console.log('Mengirim pesan:', content); // debug
+  if (!content.trim()) return;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      type: 'user',
-      content,
-      timestamp: new Date().toISOString(), // gunakan ISO string
-    };
+  const userMessage: Message = {
+    id: Date.now().toString(),
+    type: 'user',
+    content,
+    timestamp: new Date().toISOString(),
+  };
+  setMessages((prev) => [...prev, userMessage]);
+  setInputMessage('');
+  setIsTyping(true);
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInputMessage('');
-    setIsTyping(true);
-
-    const aiMessageId = (Date.now() + 1).toString();
-    const aiMessage: Message = {
+  const aiMessageId = (Date.now() + 1).toString();
+  setMessages((prev) => [
+    ...prev,
+    {
       id: aiMessageId,
       type: 'ai',
-      content: '',
-      timestamp: new Date().toISOString(), // gunakan ISO string
+      content: 'Mengetik...',
+      timestamp: new Date().toISOString(),
       isStreaming: true,
-    };
+    },
+  ]);
 
-    setMessages((prev) => [...prev, aiMessage]);
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: content }),
+    });
 
-    // Periksa API key
-    if (!OPENAI_API_KEY) {
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === aiMessageId
-            ? {
-                ...msg,
-                content: '⚠️ API key tidak ditemukan. Pastikan Anda telah menyetel NEXT_PUBLIC_OPENAI_API_KEY di file .env.local.',
-                isStreaming: false,
-              }
-            : msg
-        )
-      );
-      setIsTyping(false);
-      // Hapus pemanggilan setShowApiKeySetup(true)
-      return;
-    }
+    const data = await res.json();
 
-    try {
-      const openaiModel = openai('gpt-4o');
-      if (!openaiModel) throw new Error('API key tidak ditemukan');
-      const result = await streamText({
-        model: openaiModel,
-        system: `Anda adalah AI Tutor EduGenAI, asisten pembelajaran cerdas untuk siswa Indonesia. 
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === aiMessageId
+          ? { ...msg, content: data.reply, isStreaming: false }
+          : msg
+      )
+    );
+  } catch (error) {
+    console.error('Error:', error);
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === aiMessageId
+          ? { ...msg, content: '⚠️ Terjadi kesalahan. Coba lagi nanti.', isStreaming: false }
+          : msg
+      )
+    );
+  }
 
-KARAKTERISTIK ANDA:
-- Ramah, sabar, dan mendorong semangat belajar
-- Menggunakan bahasa Indonesia yang mudah dipahami
-- Memberikan penjelasan step-by-step yang jelas
-- Menggunakan contoh praktis dari kehidupan sehari-hari
-- Mendorong pemikiran kritis dengan pertanyaan balik
-- Menggunakan emoji untuk membuat pembelajaran lebih menyenangkan
+  setIsTyping(false);
+};
 
-GAYA MENGAJAR:
-- Mulai dengan penjelasan konsep dasar
-- Berikan contoh konkret dan relatable
-- Gunakan analogi yang mudah dipahami
-- Ajukan pertanyaan untuk memastikan pemahaman
-- Berikan tips dan trik untuk mengingat materi
-- Dorong siswa untuk bertanya lebih lanjut
-
-MATA PELAJARAN YANG DIKUASAI:
-- Matematika (SD-SMA): Aritmatika, Aljabar, Geometri, Kalkulus
-- Fisika: Mekanika, Termodinamika, Listrik, Optik
-- Kimia: Struktur atom, Ikatan kimia, Reaksi kimia
-- Biologi: Sel, Genetika, Ekologi, Anatomi
-- Bahasa Indonesia: Tata bahasa, Sastra, Menulis
-- Sejarah Indonesia dan Dunia
-- Geografi: Fisik dan Sosial
-- Dan mata pelajaran lainnya
-
-FORMAT JAWABAN:
-- Gunakan struktur yang jelas dengan heading dan bullet points
-- Berikan contoh nyata dan mudah dipahami
-- Sertakan tips praktis untuk mengingat materi
-- Akhiri dengan pertanyaan atau ajakan untuk bertanya lebih lanjut
-
-Selalu berikan jawaban yang komprehensif namun mudah dipahami sesuai level siswa.`,
-        prompt: content,
-        maxTokens: 1500,
-      });
-
-      let fullResponse = '';
-
-      for await (const delta of result.textStream) {
-        fullResponse += delta;
-        setMessages((prev) => prev.map((msg) => (msg.id === aiMessageId ? { ...msg, content: fullResponse } : msg)));
-      }
-
-      setMessages((prev) => prev.map((msg) => (msg.id === aiMessageId ? { ...msg, isStreaming: false } : msg)));
-    } catch (error) {
-      console.error('Error generating AI response:', error);
-
-      const fallbackResponse = `Maaf, saya mengalami kesulitan teknis saat memproses pertanyaan "${content}". 
-
-Namun, saya tetap bisa membantu Anda! Berikut beberapa saran:
-
-🔧 **Solusi Teknis:**
-- Pastikan koneksi internet stabil
-- Coba refresh halaman dan ulangi pertanyaan
-- Periksa apakah API key sudah dikonfigurasi dengan benar
-
-💡 **Alternatif Bantuan:**
-- Coba ajukan pertanyaan dengan kata-kata yang lebih sederhana
-- Gunakan fitur Content Generator untuk materi pembelajaran
-- Bergabung dengan komunitas untuk diskusi dengan sesama pelajar
-
-Silakan coba lagi atau ajukan pertanyaan lain. Saya siap membantu! 😊`;
-
-      setMessages((prev) => prev.map((msg) => (msg.id === aiMessageId ? { ...msg, content: fallbackResponse, isStreaming: false } : msg)));
-    }
-
-    setIsTyping(false);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-950 dark:to-black">

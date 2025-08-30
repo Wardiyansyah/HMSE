@@ -92,13 +92,13 @@ export default function LoginPage() {
         <div className="text-center">
           <GraduationCap className="mx-auto h-12 w-12 text-blue-600" />
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Masuk ke Akun Anda</h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <div className="mt-2 text-sm text-gray-600">
             Belum punya akun?
             <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
               Daftar di sini
             </Link>
             <p className="text-gray-400">sementara</p>
-          </p>
+          </div>
         </div>
 
         <Card>
