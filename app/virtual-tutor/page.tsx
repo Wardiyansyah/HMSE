@@ -19,12 +19,12 @@ import { Sparkles, Brain, ChevronDown, ChevronUp, Lightbulb, BookOpen, Calculato
 const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
 
 // Tambahkan pengecekan agar API key tidak undefined/null
-const openai = (modelId: string) => {
-  if (!OPENAI_API_KEY) {
-    return null;
-  }
-  return openaiBase(modelId as any, { apiKey: OPENAI_API_KEY });
-};
+// const openai = (modelId: string) => {
+//   if (!OPENAI_API_KEY) {
+//     return null;
+//   }
+//   return openaiBase(modelId as any, { apiKey: OPENAI_API_KEY });
+// };
 
 interface Message {
   id: string;
