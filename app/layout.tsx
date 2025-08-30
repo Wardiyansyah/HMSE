@@ -1,65 +1,53 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
-import { ThemeProvider } from "@/lib/theme-context"
-import { LanguageProvider } from "@/lib/language-context"
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { Brain, Home, Sparkles, MessageCircle, BarChart3, BookOpen, Users, Settings } from "lucide-react"
-import Link from "next/link"
+import type React from 'react';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { ThemeProvider } from '@/lib/theme-context';
+import { LanguageProvider } from '@/lib/language-context';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { Brain, Home, Sparkles, MessageCircle, BarChart3, BookOpen, Users, Settings } from 'lucide-react';
+import Link from 'next/link';
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "EduGenAI - Generative AI untuk Pendidikan Berkelanjutan",
-  description:
-    "Platform pembelajaran AI yang menghadirkan pengalaman belajar personal dan adaptif untuk semua kalangan",
-    generator: 'v0.dev'
-}
+  title: 'InsanAI - Intelligent Assistant for Insan Pembangunan',
+  description: 'Platform pembelajaran AI yang menghadirkan pengalaman belajar personal dan adaptif untuk semua kalangan',
+  generator: 'InsanPembangunanDev',
+};
 
 const menuItems = [
   {
-    title: "Dashboard",
-    url: "/",
+    title: 'Dashboard',
+    url: '/',
     icon: Home,
   },
   {
-    title: "AI Content Generator",
-    url: "/content-generator",
+    title: 'AI Content Generator',
+    url: '/content-generator',
     icon: Sparkles,
   },
   {
-    title: "Virtual Tutor",
-    url: "/virtual-tutor",
+    title: 'Virtual Tutor',
+    url: '/virtual-tutor',
     icon: MessageCircle,
   },
   {
-    title: "Learning Analytics",
-    url: "/analytics",
+    title: 'Learning Analytics',
+    url: '/analytics',
     icon: BarChart3,
   },
   {
-    title: "Perpustakaan",
-    url: "/library",
+    title: 'Perpustakaan',
+    url: '/library',
     icon: BookOpen,
   },
   {
-    title: "Komunitas",
-    url: "/community",
+    title: 'Komunitas',
+    url: '/community',
     icon: Users,
   },
-]
+];
 
 function AppSidebar() {
   return (
@@ -70,9 +58,7 @@ function AppSidebar() {
             <Brain className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              EduGenAI
-            </h2>
+            <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">EduGenAI</h2>
             <p className="text-xs text-gray-600">AI Education Platform</p>
           </div>
         </div>
@@ -109,25 +95,19 @@ function AppSidebar() {
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id">
       <body className={inter.className}>
         <ThemeProvider>
           <LanguageProvider>
-            <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-950 dark:to-black transition-colors duration-300">
-              {children}
-            </main>
+            <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-950 dark:to-black transition-colors duration-300">{children}</main>
           </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
