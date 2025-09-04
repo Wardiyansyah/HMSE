@@ -10,29 +10,20 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useAppStore } from '@/lib/store';
 import { NavigationHeader } from '@/components/navigation-header';
-import { streamText } from 'ai';
-import { openai as openaiBase } from '@ai-sdk/openai';
 import { Label } from '@/components/ui/label';
 import { RefreshCw, Send } from 'lucide-react';
 import { Sparkles, Brain, ChevronDown, ChevronUp, Lightbulb, BookOpen, Calculator, Beaker, Globe, History, User, ImageIcon, FileText } from 'lucide-react';
 
-const OPENAI_API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-
-// Tambahkan pengecekan agar API key tidak undefined/null
-// const openai = (modelId: string) => {
-//   if (!OPENAI_API_KEY) {
-//     return null;
-//   }
-//   return openaiBase(modelId as any, { apiKey: OPENAI_API_KEY });
-// };
 
 interface Message {
   id: string;
   type: 'user' | 'ai';
   content: string;
-  timestamp: string; // ubah ke string
+  timestamp: string;
+  image?: string; // tambahkan field opsional untuk gambar
   isStreaming?: boolean;
 }
+
 
 export default function VirtualTutor() {
   const { user, startSession, endSession } = useAppStore();
@@ -48,12 +39,10 @@ export default function VirtualTutor() {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isQuickQuestionsOpen, setIsQuickQuestionsOpen] = useState(false);
   const [isCapabilitiesOpen, setIsCapabilitiesOpen] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-
-  // Hapus state untuk menampilkan ApiKeySetup
-  // const [showApiKeySetup, setShowApiKeySetup] = useState(!OPENAI_API_KEY);
 
   const quickQuestions = [
     {
@@ -88,6 +77,19 @@ export default function VirtualTutor() {
     },
   ];
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedImage(e.target.files[0]);
+    }
+  };
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+const handleOpenFileDialog = () => {
+  fileInputRef.current?.click();
+};
+
+
   useEffect(() => {
     startSession('Virtual Tutor', 'AI Chat');
     return () => endSession();
@@ -103,14 +105,17 @@ export default function VirtualTutor() {
   }, [messages]);
 
   const handleSendMessage = async (content: string) => {
-  if (!content.trim()) return;
+  if (!content.trim() && !selectedImage) return;
 
   const userMessage: Message = {
-    id: Date.now().toString(),
-    type: 'user',
-    content,
-    timestamp: new Date().toISOString(),
-  };
+  id: Date.now().toString(),
+  type: "user",
+  content: content || "", // teks tetap disimpan
+  image: selectedImage ? URL.createObjectURL(selectedImage) : undefined,
+  timestamp: new Date().toISOString(),
+};
+
+
   setMessages((prev) => [...prev, userMessage]);
   setInputMessage('');
   setIsTyping(true);
@@ -128,10 +133,15 @@ export default function VirtualTutor() {
   ]);
 
   try {
+    const formData = new FormData();
+      formData.append('message', content);
+      if (selectedImage) {
+        formData.append('image', selectedImage);
+      }
+
     const res = await fetch('/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: content }),
+      body: formData
     });
 
     const data = await res.json();
@@ -154,6 +164,7 @@ export default function VirtualTutor() {
     );
   }
 
+  setSelectedImage(null)
   setIsTyping(false);
 };
 
@@ -161,8 +172,6 @@ export default function VirtualTutor() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-950 dark:to-black">
       <NavigationHeader />
-      {/* Hapus pemanggilan komponen ApiKeySetup */}
-      {/* {showApiKeySetup && <ApiKeySetup onClose={() => setShowApiKeySetup(false)} />} */}
 
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         {/* Header */}
@@ -177,7 +186,7 @@ export default function VirtualTutor() {
               <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
               Online
             </Badge>
-            <Badge variant="outline">Powered by OpenAI GPT-4</Badge>
+            <Badge variant="outline">Powered by Insan AI</Badge>
             <Badge variant="outline" className="hidden sm:inline-flex">
               Machine Learning
             </Badge>
@@ -223,18 +232,51 @@ export default function VirtualTutor() {
                               {message.type === 'user' ? <User className="h-4 w-4" /> : <Brain className="h-4 w-4" />}
                             </AvatarFallback>
                           </Avatar>
-                          <div className={`rounded-lg p-3 md:p-4 break-words ${message.type === 'user' ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white' : 'bg-white dark:bg-card border shadow-sm dark:border-gray-700'}`}>
-                            <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                              {message.content}
-                              {message.isStreaming && <span className="inline-block w-2 h-4 bg-gray-400 dark:bg-gray-500 ml-1 animate-pulse"></span>}
-                            </div>
-                            <div className={`text-xs mt-2 ${message.type === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                          <div
+                            className={`rounded-lg p-3 md:p-4 break-words ${
+                              message.type === 'user'
+                                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white'
+                                : 'bg-white dark:bg-card border shadow-sm dark:border-gray-700'
+                            }`}
+                          >
+                            {/* tampilkan gambar kalau ada */}
+                            {message.image && (
+                              <div className="mb-2">
+                                <img
+                                  src={message.image}
+                                  alt="Gambar yang dikirim"
+                                  className="rounded-lg max-w-[200px] border"
+                                />
+                              </div>
+                            )}
+
+                            {/* tampilkan teks */}
+                            {message.content && (
+                              <div
+                                className={`whitespace-pre-wrap text-sm leading-relaxed ${
+                                  message.type === 'user' ? 'text-white' : 'text-gray-800 dark:text-gray-200'
+                                }`}
+                              >
+                                {message.content}
+                                {message.isStreaming && (
+                                  <span className="inline-block w-2 h-4 bg-gray-400 ml-1 animate-pulse"></span>
+                                )}
+                              </div>
+                            )}
+
+                            {/* timestamp */}
+                            <div
+                              className={`text-xs mt-2 ${
+                                message.type === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
+                              }`}
+                            >
                               {new Date(message.timestamp).toLocaleTimeString('id-ID', {
                                 hour: '2-digit',
                                 minute: '2-digit',
                               })}
                             </div>
                           </div>
+
                         </div>
                       </div>
                     ))}
@@ -265,6 +307,10 @@ export default function VirtualTutor() {
               </CardContent>
 
               <div className="border-t dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800 flex-shrink-0">
+                {/* Info gambar yang dipilih */}
+                  {selectedImage && (
+                    <p className="text-xs text-gray-500 mb-4">📷 Gambar dipilih: {selectedImage.name}</p>
+                  )}
                 <div className="flex space-x-2">
                   <Input
                     placeholder="Tanyakan apa saja tentang pelajaran Anda..."
@@ -279,10 +325,31 @@ export default function VirtualTutor() {
                     className="flex-1"
                     disabled={isTyping}
                   />
-                  <Button size="icon" variant="outline" disabled className="hidden sm:flex bg-transparent">
+                  {/* Input file tersembunyi */}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                    ref={fileInputRef}
+                  />
+                  {/* Tombol gambar, buka file dialog via ref */}
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    className="sm:flex bg-transparent cursor-pointer"
+                    type="button"
+                    onClick={handleOpenFileDialog}
+                  >
                     <ImageIcon className="h-4 w-4" />
                   </Button>
-                  <Button onClick={() => handleSendMessage(inputMessage)} disabled={!inputMessage.trim() || isTyping} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+
+                  {/* Tombol kirim pesan */}
+                  <Button
+                    onClick={() => handleSendMessage(inputMessage)}
+                    disabled={(!inputMessage.trim() && !selectedImage) || isTyping}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  >
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
