@@ -26,7 +26,7 @@ const Home: NextPage = () => {
     setInput('');
     setLoading(true);
 
-    const res = await fetch('/api/chat', {
+    const res = await fetch('/api/chat-guest', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: userMessage }),

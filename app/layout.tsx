@@ -43,7 +43,7 @@ const menuItems = [
     icon: BookOpen,
   },
   {
-    title: 'Komunitas',
+    title: 'Grup Belajar',
     url: '/community',
     icon: Users,
   },

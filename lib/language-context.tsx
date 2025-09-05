@@ -22,8 +22,8 @@ const translations = {
     "nav.content-generator": "AI Content Generator",
     "nav.virtual-tutor": "Virtual Tutor",
     "nav.analytics": "Learning Analytics",
-    "nav.library": "Perpustakaan",
-    "nav.community": "Komunitas",
+    "nav.library": "Materi Pembelajaran",
+    "nav.community": "Grup Belajar",
     "nav.settings": "Pengaturan",
 
     // Dashboard
@@ -128,8 +128,8 @@ const translations = {
     "library.highest-rated": "Rating Tertinggi",
 
     // Community
-    "community.title": "Komunitas EduGenAI",
-    "community.subtitle": "Bergabunglah dengan komunitas pembelajar untuk berbagi pengetahuan dan saling membantu",
+    "community.title": "Grup Belajar InsanAI",
+    "community.subtitle": "Bergabunglah dengan grup belajar untuk berbagi pengetahuan dan saling membantu",
     "community.search": "Cari diskusi, pertanyaan, atau topik...",
     "community.create-discussion": "Buat Diskusi Baru",
     "community.discussions": "Diskusi",

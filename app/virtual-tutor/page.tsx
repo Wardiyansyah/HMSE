@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useAppStore } from '@/lib/store';
-import { NavigationHeader } from '@/components/navigation-header';
+import { NavigationHeader } from '@/components/navigation-header-student';
 import { Label } from '@/components/ui/label';
 import { RefreshCw, Send } from 'lucide-react';
 import { Sparkles, Brain, ChevronDown, ChevronUp, Lightbulb, BookOpen, Calculator, Beaker, Globe, History, User, ImageIcon, FileText } from 'lucide-react';
@@ -33,7 +33,7 @@ export default function VirtualTutor() {
       type: 'ai',
       content: `Halo ${
         user?.name || 'Siswa'
-      }! 👋 Saya AI Tutor EduGenAI, siap membantu Anda belajar dengan cara yang menyenangkan dan efektif!\n\n🎯 Saya bisa membantu Anda dengan:\n• Penjelasan konsep dari berbagai mata pelajaran\n• Pemecahan soal step-by-step\n• Tips dan strategi belajar\n• Persiapan ujian dan tugas\n\nSilakan ajukan pertanyaan atau pilih topik dari menu di samping. Mari kita mulai belajar! 🚀`,
+      }! 👋 Saya AI Tutor Insan AI, siap membantu Anda belajar dengan cara yang menyenangkan dan efektif!\n\n🎯 Saya bisa membantu Anda dengan:\n• Penjelasan konsep dari berbagai mata pelajaran\n• Pemecahan soal step-by-step\n• Tips dan strategi belajar\n• Persiapan ujian dan tugas\n\nSilakan ajukan pertanyaan atau pilih topik dari menu di samping. Mari kita mulai belajar! 🚀`,
       timestamp: new Date().toISOString(), // gunakan ISO string
     },
   ]);
@@ -139,7 +139,7 @@ const handleOpenFileDialog = () => {
         formData.append('image', selectedImage);
       }
 
-    const res = await fetch('/api/chat', {
+    const res = await fetch('/api/chat-tutor', {
       method: 'POST',
       body: formData
     });
@@ -149,7 +149,7 @@ const handleOpenFileDialog = () => {
     setMessages((prev) =>
       prev.map((msg) =>
         msg.id === aiMessageId
-          ? { ...msg, content: data.reply, isStreaming: false }
+          ? { ...msg, content: data.reply || "", image: data.imageUrl || undefined, isStreaming: false }
           : msg
       )
     );
@@ -210,7 +210,7 @@ const handleOpenFileDialog = () => {
                   </Avatar>
                   <div>
                     <CardTitle className="text-base md:text-lg flex items-center">
-                      AI Tutor EduGenAI
+                      AI Tutor Insan AI
                       <Sparkles className="h-4 w-4 ml-2 text-yellow-500" />
                     </CardTitle>
                     <CardDescription className="flex items-center text-sm">
@@ -239,14 +239,33 @@ const handleOpenFileDialog = () => {
                                 : 'bg-white dark:bg-card border shadow-sm dark:border-gray-700'
                             }`}
                           >
-                            {/* tampilkan gambar kalau ada */}
-                            {message.image && (
+                            {/* gambar dari user */}
+                            {message.type === 'user' && message.image && (
                               <div className="mb-2">
                                 <img
                                   src={message.image}
                                   alt="Gambar yang dikirim"
                                   className="rounded-lg max-w-[200px] border"
                                 />
+                              </div>
+                            )}
+
+                            {/* Gambar dari AI */}
+                            {message.type === 'ai' && message.image && (
+                              <div className="mb-2">
+                                <img
+                                  src={message.image}
+                                  alt="Gambar dari AI"
+                                  className="rounded-lg max-w-[200px] border"
+                                />
+                                <a
+                                  href={message.image}
+                                  target="_blank"
+                                  download="ai-gambar.png"
+                                  className="text-xs text-blue-500 hover:underline block mt-1"
+                                >
+                                  ⬇️ Download Gambar
+                                </a>
                               </div>
                             )}
 
