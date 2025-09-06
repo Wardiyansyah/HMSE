@@ -60,15 +60,15 @@ interface ContentType {
 }
 
 const contentTypes: ContentType[] = [
-  {
-    id: 'package',
-    title: 'Paket Lengkap',
-    description: 'PPT + Video + Quiz + Materi',
-    icon: <Sparkles className="h-6 w-6" />,
-    color: 'from-purple-500 to-pink-500',
-    features: ['Presentasi PowerPoint', 'Video Pembelajaran', 'Kuis Interaktif', 'Materi Bacaan'],
-    estimatedTime: '5-8 menit',
-  },
+  // {
+  //   id: 'package',
+  //   title: 'Paket Lengkap',
+  //   description: 'PPT + Video + Quiz + Materi',
+  //   icon: <Sparkles className="h-6 w-6" />,
+  //   color: 'from-purple-500 to-pink-500',
+  //   features: ['Presentasi PowerPoint', 'Video Pembelajaran', 'Kuis Interaktif', 'Materi Bacaan'],
+  //   estimatedTime: '5-8 menit',
+  // },
   {
     id: 'presentation',
     title: 'Presentasi',
@@ -96,15 +96,15 @@ const contentTypes: ContentType[] = [
     features: ['10-20 Soal', 'Pembahasan Lengkap', 'Skor Otomatis'],
     estimatedTime: '1-2 menit',
   },
-  {
-    id: 'material',
-    title: 'Materi Bacaan',
-    description: 'Dokumen pembelajaran lengkap',
-    icon: <BookOpen className="h-6 w-6" />,
-    color: 'from-indigo-500 to-purple-500',
-    features: ['Format PDF', 'Ilustrasi', 'Ringkasan'],
-    estimatedTime: '2-4 menit',
-  },
+  // {
+  //   id: 'material',
+  //   title: 'Materi Bacaan',
+  //   description: 'Dokumen pembelajaran lengkap',
+  //   icon: <BookOpen className="h-6 w-6" />,
+  //   color: 'from-indigo-500 to-purple-500',
+  //   features: ['Format PDF', 'Ilustrasi', 'Ringkasan'],
+  //   estimatedTime: '2-4 menit',
+  // },
 ];
 
 const subjects = [

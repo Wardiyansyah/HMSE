@@ -298,8 +298,6 @@ export async function signUp(data: SignupData): Promise<AuthResponse> {
         role: data.role,
         phone: data.phone || null,
         status: 'active',
-        nisn: data.nisn || null,
-        class_id: data.class_id || null,
       })
       .select()
       .single();
