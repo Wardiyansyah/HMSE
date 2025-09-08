@@ -303,6 +303,15 @@ export default function ContentGenerator() {
     }
   };
 
+
+function cleanJSONResponse(responseText) {
+  return responseText
+    .replace(/^```json\s*/i, "") // remove starting ```json
+    .replace(/^```\s*/i, "")     // in case it's just ``` without json
+    .replace(/\s*```$/i, "")     // remove ending ```
+    .trim();
+}
+
   const generateAIContent = async (): Promise<any> => {
     if (!apiKey) {
       throw new Error('API key tidak tersedia');
@@ -448,7 +457,8 @@ PEDOMAN:
     }
 
     const result = await generateWithOpenAI(systemPrompt, userPrompt);
-    return JSON.parse(result);
+
+    return JSON.parse(cleanJSONResponse(result));
   };
 
   const simulateGeneration = async () => {
