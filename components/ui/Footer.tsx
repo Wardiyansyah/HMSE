@@ -11,11 +11,6 @@ const Footer = () => {
             </Link>
           </div>
           <div className="px-5 py-2">
-            <Link href="/blog" className="text-base text-gray-500 hover:text-gray-900">
-              Blog
-            </Link>
-          </div>
-          <div className="px-5 py-2">
             <Link href="/privacy" className="text-base text-gray-500 hover:text-gray-900">
               Kebijakan Privasi
             </Link>
