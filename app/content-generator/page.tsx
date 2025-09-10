@@ -47,6 +47,7 @@ interface GeneratedContent {
   status: 'generating' | 'completed' | 'error';
   progress: number;
   youtubeVideos?: YouTubeVideo[];
+  pptBlob?: Blob;
 }
 
 interface ContentType {
@@ -203,6 +204,8 @@ export default function ContentGenerator() {
   const [generationProgress, setGenerationProgress] = useState(0);
   const [isSearchingVideos, setIsSearchingVideos] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pptBlob, setPptBlob] = useState<Blob | null>(null);
+
 
   // API Key management
   const [apiKey, setApiKey] = useState<string | null>(null);
@@ -244,7 +247,7 @@ export default function ContentGenerator() {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-5',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
@@ -510,6 +513,33 @@ PEDOMAN:
       };
 
       setGeneratedContent((prev) => [newContent, ...prev]);
+
+      if (contentType === "presentation") {
+        try {
+          const res = await fetch("/api/generate-ppt", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              content: newContent.content,
+              apiKey: apiKey,
+            }),
+          });
+
+          if (res.ok) {
+            const blob = await res.blob();
+            setGeneratedContent((prev) => {
+              const updated = [...prev];
+              updated[0] = { ...updated[0], pptBlob: blob };
+              return updated;
+            });
+          } else {
+            console.error("❌ Gagal generate PPT:", await res.text());
+          }
+        } catch (err) {
+          console.error("💥 Error saat generate PPT:", err);
+        }
+      }
+
     } catch (error: any) {
       console.error('Error generating content:', error);
       setError(error.message || 'Terjadi kesalahan saat membuat konten');
@@ -956,25 +986,23 @@ PEDOMAN:
                           </Button>
                           <Button
                             variant="outline"
-                            onClick={async () => {
-                              const res = await fetch("/api/generate-ppt", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ content: content.content }),
-                              });
-                              const blob = await res.blob();
-                              const url = window.URL.createObjectURL(blob);
+                            onClick={() => {
+                              if (!content.pptBlob) return;
+                              const url = window.URL.createObjectURL(content.pptBlob);
                               const a = document.createElement("a");
                               a.href = url;
-                              a.download = `${content.title}.pptx`;
+                              a.download = `${content.title || "Presentasi"}.pptx`;
                               document.body.appendChild(a);
                               a.click();
                               a.remove();
+                              window.URL.revokeObjectURL(url);
                             }}
+                            disabled={!content.pptBlob}
                           >
                             <Download className="h-4 w-4 mr-2" />
                             Download
                           </Button>
+
                           <Button variant="outline">
                             <Share2 className="h-4 w-4 mr-2" />
                             Bagikan
