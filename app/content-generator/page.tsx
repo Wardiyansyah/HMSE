@@ -60,15 +60,6 @@ interface ContentType {
 }
 
 const contentTypes: ContentType[] = [
-  // {
-  //   id: 'package',
-  //   title: 'Paket Lengkap',
-  //   description: 'PPT + Video + Quiz + Materi',
-  //   icon: <Sparkles className="h-6 w-6" />,
-  //   color: 'from-purple-500 to-pink-500',
-  //   features: ['Presentasi PowerPoint', 'Video Pembelajaran', 'Kuis Interaktif', 'Materi Bacaan'],
-  //   estimatedTime: '5-8 menit',
-  // },
   {
     id: 'presentation',
     title: 'Presentasi',
@@ -304,13 +295,13 @@ export default function ContentGenerator() {
   };
 
 
-function cleanJSONResponse(responseText) {
-  return responseText
-    .replace(/^```json\s*/i, "") // remove starting ```json
-    .replace(/^```\s*/i, "")     // in case it's just ``` without json
-    .replace(/\s*```$/i, "")     // remove ending ```
-    .trim();
-}
+  function cleanJSONResponse(responseText) {
+    return responseText
+      .replace(/^```json\s*/i, "") // remove starting ```json
+      .replace(/^```\s*/i, "")     // in case it's just ``` without json
+      .replace(/\s*```$/i, "")     // remove ending ```
+      .trim();
+  }
 
   const generateAIContent = async (): Promise<any> => {
     if (!apiKey) {
@@ -322,7 +313,7 @@ function cleanJSONResponse(responseText) {
 
     switch (contentType) {
       case 'presentation':
-        systemPrompt = `Anda adalah AI Content Generator untuk EduGenAI yang ahli dalam membuat presentasi pembelajaran.
+        systemPrompt = `Anda adalah AI Content Generator untuk Insan AI yang ahli dalam membuat presentasi pembelajaran.
 
 Tugas Anda adalah membuat presentasi pembelajaran yang komprehensif dalam format JSON dengan struktur berikut:
 
@@ -359,7 +350,7 @@ PEDOMAN:
         break;
 
       case 'quiz':
-        systemPrompt = `Anda adalah AI Content Generator untuk EduGenAI yang ahli dalam membuat kuis pembelajaran.
+        systemPrompt = `Anda adalah AI Content Generator untuk Insan AI yang ahli dalam membuat kuis pembelajaran.
 
 Tugas Anda adalah membuat kuis dalam format JSON dengan struktur berikut:
 
@@ -395,7 +386,7 @@ PEDOMAN:
         break;
 
       case 'material':
-        systemPrompt = `Anda adalah AI Content Generator untuk EduGenAI yang ahli dalam membuat materi pembelajaran.
+        systemPrompt = `Anda adalah AI Content Generator untuk Insan AI yang ahli dalam membuat materi pembelajaran.
 
 Tugas Anda adalah membuat materi pembelajaran komprehensif dalam format JSON:
 
@@ -963,7 +954,24 @@ PEDOMAN:
                             <Eye className="h-4 w-4 mr-2" />
                             Lihat Konten
                           </Button>
-                          <Button variant="outline">
+                          <Button
+                            variant="outline"
+                            onClick={async () => {
+                              const res = await fetch("/api/generate-ppt", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ content: content.content }),
+                              });
+                              const blob = await res.blob();
+                              const url = window.URL.createObjectURL(blob);
+                              const a = document.createElement("a");
+                              a.href = url;
+                              a.download = `${content.title}.pptx`;
+                              document.body.appendChild(a);
+                              a.click();
+                              a.remove();
+                            }}
+                          >
                             <Download className="h-4 w-4 mr-2" />
                             Download
                           </Button>

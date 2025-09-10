@@ -10,7 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useAppStore } from '@/lib/store';
 import { NavigationHeader } from '@/components/navigation-header-student';
-import { Label } from '@/components/ui/label';
+import { Label } from '@/components/ui/label'; 
 import { RefreshCw, Send } from 'lucide-react';
 import { Sparkles, Brain, ChevronDown, ChevronUp, Lightbulb, BookOpen, Calculator, Beaker, Globe, History, User, ImageIcon, FileText } from 'lucide-react';
 
