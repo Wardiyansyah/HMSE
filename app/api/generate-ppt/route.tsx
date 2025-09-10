@@ -111,12 +111,13 @@ export async function POST(req: Request) {
     // 🎨 Closing
     let closing = pptx.addSlide();
     closing.background = { color: "1F497D" };
-    closing.addText("Terima kasih 🙏", {
-      x: 2,
-      y: 2.5,
+    closing.addText("Terima kasih", {
+      x: 0.5,
+      y: 0.5,
       fontSize: 32,
       bold: true,
       color: "FFFFFF",
+      align: "center",
     });
 
     const buffer = await pptx.write("nodebuffer");
