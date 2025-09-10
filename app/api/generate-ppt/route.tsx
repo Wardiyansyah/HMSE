@@ -112,8 +112,8 @@ export async function POST(req: Request) {
     let closing = pptx.addSlide();
     closing.background = { color: "1F497D" };
     closing.addText("Terima kasih", {
-      x: 0.5,
-      y: 0.5,
+      x: 2,
+      y: 2.5,
       fontSize: 32,
       bold: true,
       color: "FFFFFF",
