@@ -38,7 +38,7 @@ export default function SignupPage() {
   const [formData, setFormData] = useState<SignupData>({
     username: '',
     password: '',
-    nama: '',
+    full_name: '',
     kelas: '',
     role: 'student',
     nisn: '',
@@ -88,7 +88,7 @@ export default function SignupPage() {
 
     try {
       // Validate required fields
-      if (!formData.username || !formData.password || !formData.nama || !formData.kelas) {
+      if (!formData.username || !formData.password || !formData.full_name || !formData.kelas) {
         setError('Mohon lengkapi semua field yang wajib diisi');
         return;
       }
@@ -196,8 +196,8 @@ export default function SignupPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="nama">Nama Lengkap *</Label>
-                  <Input id="nama" type="text" value={formData.nama} onChange={(e) => handleInputChange('nama', e.target.value)} placeholder="Masukkan nama lengkap" required />
+                  <Label htmlFor="full_name">Nama Lengkap *</Label>
+                  <Input id="full_name" type="text" value={formData.full_name} onChange={(e) => handleInputChange('full_name', e.target.value)} placeholder="Masukkan nama lengkap" required />
                 </div>
 
                 <div>
