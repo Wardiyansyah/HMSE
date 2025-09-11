@@ -328,7 +328,11 @@ Tugas Anda adalah membuat presentasi pembelajaran yang komprehensif dalam format
       "slideNumber": 1,
       "title": "Judul Slide",
       "content": "Konten utama slide",
-      "bulletPoints": ["Poin 1", "Poin 2", "Poin 3"],
+      "points": [
+        { "bullet": "Poin 1", "desc": "Penjelasan Poin 1" },
+        { "bullet": "Poin 2", "desc": "Penjelasan Poin 2" },
+        { "bullet": "Poin 3", "desc": "Penjelasan Poin 3" }
+      ],
       "notes": "Catatan untuk presenter"
     }
   ],
@@ -850,7 +854,7 @@ PEDOMAN:
 
           {/* Generation Progress */}
           {isGenerating && (
-            <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm max-w-2xl mx-auto">
+            <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm max-w-2xl mx-auto mt-6">
               <CardContent className="pt-6">
                 <div className="text-center space-y-6">
                   <div className="relative">

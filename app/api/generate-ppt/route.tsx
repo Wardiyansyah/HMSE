@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     const { content, apiKey } = await req.json();
     const pptx = new PptxGenJS();
 
-    // 🎨 Cover
+    // Cover
     let cover = pptx.addSlide();
     cover.background = { color: "1F497D" };
     cover.addText(content.title || "Judul Presentasi", {
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
       color: "D9E1F2",
     });
 
-    // 🎨 Isi slides
+    // Isi slides
     const bgColors = ["FFFFFF", "F2F2F2", "EAF3FF"];
     if (content.slides) {
       for (let i = 0; i < content.slides.length; i++) {
@@ -80,15 +80,27 @@ export async function POST(req: Request) {
         });
 
         // Bullet points
-        slideData.bulletPoints?.forEach((point: string, idx: number) => {
-          s.addText(`• ${point}`, {
+        slideData.points?.forEach((p: { bullet: string; desc?: string }, idx: number) => {
+          s.addText(`• ${p.bullet}`, {
             x: 0.5,
-            y: 0 + idx * 0.6,
+            y: 1.0 + idx * 1.0,
             w: 5.0,
-            h: 4.5,
+            h: 0.5,
             fontSize: 18,
-            color: "333333",
+            bold: true,
+            color: "1F497D",
           });
+
+          if (p.desc) {
+            s.addText(p.desc, {
+              x: 1.0,
+              y: 1.4 + idx * 1.0,
+              w: 4.5,
+              h: 0.5,
+              fontSize: 14,
+              color: "444444",
+            });
+          }
         });
 
         // Gambar dari DALL·E
@@ -108,7 +120,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // 🎨 Closing
+    // Closing
     let closing = pptx.addSlide();
     closing.background = { color: "1F497D" };
     closing.addText("Terima kasih", {
