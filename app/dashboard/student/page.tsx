@@ -123,7 +123,7 @@ export default function EduGenAIDashboard() {
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{t('dashboard.welcome')}, Jamaludin👋</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{t('dashboard.welcome')}, {user?.name} 👋</h2>
               <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
                 {currentUserRole === 'student' && t('dashboard.student.subtitle')}
                 {currentUserRole === 'teacher' && t('dashboard.teacher.subtitle')}

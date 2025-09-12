@@ -10,6 +10,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useAppStore } from '@/lib/store';
 import { Brain, Home, Sparkles, MessageCircle, BarChart3, BookOpen, Users, Settings, Menu, ChevronDown, User, LogOut } from 'lucide-react';
+import { getCurrentUser, getUserProfile } from '@/lib/auth-helpers';
+import { supabase } from '@/lib/supabase';
+
 const menuItems = [
   {
     title: 'Dashboard',

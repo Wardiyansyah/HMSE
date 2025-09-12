@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { getCurrentUser, getUserProfile } from '@/lib/auth-helpers';
+import { supabase } from '@/lib/supabase';
 
 interface User {
   id: string;
@@ -31,6 +33,7 @@ interface AppState {
     activity: string | null;
   };
   setUser: (user: User) => void;
+  refreshUser: () => Promise<void>;
   updateProgress: (subject: string, progress: number) => void;
   startSession: (subject: string, activity: string) => void;
   endSession: () => void;
@@ -40,18 +43,7 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
-      user: {
-        id: '1',
-        name: 'Ahmad Rizk',
-        email: 'ahmad.rizki@example.com',
-        role: 'student',
-        preferences: {
-          language: 'id',
-          theme: 'light',
-          notifications: true,
-          aiAssistance: true,
-        },
-      },
+      user: null,
       learningProgress: [
         { subject: 'Matematika', progress: 85, lastAccessed: new Date(), timeSpent: 120 },
         { subject: 'Fisika', progress: 72, lastAccessed: new Date(), timeSpent: 95 },
@@ -64,6 +56,31 @@ export const useAppStore = create<AppState>()(
         activity: null,
       },
       setUser: (user) => set({ user }),
+      refreshUser: async () => {
+        const { getCurrentUser } = await import('@/lib/auth-helpers');
+        const { user } = await getCurrentUser();
+        if (user) {
+          let mappedRole: 'student' | 'teacher' | 'professional' =
+            user.role === 'admin' ? 'professional' : user.role;
+          set({
+            user: {
+              id: user.id,
+              name: user.full_name || user.username,
+              email: user.email,
+              role: mappedRole,
+              avatar: user.avatar_url,
+              preferences: {
+                language: 'id',
+                theme: 'light',
+                notifications: true,
+                aiAssistance: true,
+              },
+            },
+          });
+        } else {
+          set({ user: null });
+        }
+      },
       updateProgress: (subject, progress) =>
         set((state) => ({
           learningProgress: state.learningProgress.map((p) => (p.subject === subject ? { ...p, progress, lastAccessed: new Date() } : p)),
@@ -96,6 +113,29 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'edugenai-store',
+      onRehydrateStorage: () => async (state) => {
+        // Fetch current user from session/db
+        const { getCurrentUser } = await import('@/lib/auth-helpers');
+        const { user } = await getCurrentUser();
+        if (user) {
+          // Map 'admin' role to 'professional' for AppState.User compatibility
+          let mappedRole: 'student' | 'teacher' | 'professional' =
+            user.role === 'admin' ? 'professional' : user.role;
+          state?.setUser({
+            id: user.id,
+            name: user.full_name || user.username,
+            email: user.email,
+            role: mappedRole,
+            avatar: user.avatar_url,
+            preferences: {
+              language: 'id',
+              theme: 'light',
+              notifications: true,
+              aiAssistance: true,
+            },
+          });
+        }
+      },
     }
   )
 );

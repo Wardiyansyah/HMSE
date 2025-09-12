@@ -10,6 +10,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useAppStore } from '@/lib/store';
 import { Brain, Home, Sparkles, MessageCircle, BarChart3, BookOpen, Users, Settings, Menu, ChevronDown, User, LogOut } from 'lucide-react';
+import { getCurrentUser, getUserProfile } from '@/lib/auth-helpers';
+import { supabase } from '@/lib/supabase';
 
 const menuItems = [
   {
@@ -115,7 +117,7 @@ export function NavigationHeader() {
           <div className="flex items-center space-x-3">
             {/* User Info - Hidden on small screens */}
             <div className="hidden lg:block text-right">
-              <p className="text-sm font-medium">Jamaludin</p>
+              <p className="text-sm font-medium">{user?.name}</p>
               <Badge variant="secondary" className="text-xs">
                 Siswa
               </Badge>
@@ -139,8 +141,8 @@ export function NavigationHeader() {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium">Jamaludin</p>
-                    <p className="text-xs text-gray-500">jamal</p>
+                    <p className="text-sm font-medium">{user?.name}</p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
                     <Badge variant="secondary" className="text-xs w-fit">
                       Siswa
                     </Badge>
@@ -198,7 +200,7 @@ export function NavigationHeader() {
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium">Jamaludin</p>
+                          <p className="font-medium">{user?.name}</p>
                           <p className="text-sm text-gray-600">student@demo.com</p>
                           <Badge variant="secondary" className="text-xs mt-1">
                             Siswa
