@@ -51,6 +51,7 @@ export async function POST(req: Request) {
       fontSize: 40,
       bold: true,
       color: "FFFFFF",
+      align: "center",
     });
     cover.addText(content.description || "", {
       x: 1,
@@ -79,29 +80,100 @@ export async function POST(req: Request) {
           align: "center",
         });
 
-        // Bullet points
-        slideData.points?.forEach((p: { bullet: string; desc?: string }, idx: number) => {
-          s.addText(`• ${p.bullet}`, {
-            x: 0.5,
-            y: 1.0 + idx * 1.0,
-            w: 5.0,
-            h: 0.5,
-            fontSize: 18,
-            bold: true,
-            color: "1F497D",
-          });
+        // Bullet points dinamis
+        const MAX_POINTS_PER_SLIDE = 6;
 
-          if (p.desc) {
-            s.addText(p.desc, {
-              x: 1.0,
-              y: 1.4 + idx * 1.0,
-              w: 4.5,
-              h: 0.5,
-              fontSize: 14,
-              color: "444444",
+        if (slideData.points && slideData.points.length > 0) {
+          if (slideData.points.length <= 4) {
+            // --- sedikit poin, font normal ---
+            slideData.points.forEach((p, idx) => {
+              s.addText(`• ${p.bullet}`, {
+                x: 0.5,
+                y: 1.2 + idx * 1.2,
+                w: 5.0,
+                h: 0.5,
+                fontSize: 18,
+                bold: true,
+                color: "1F497D",
+              });
+              if (p.desc) {
+                s.addText(p.desc, {
+                  x: 1.0,
+                  y: 1.5 + idx * 1.2,
+                  w: 4.5,
+                  h: 0.5,
+                  fontSize: 14,
+                  color: "444444",
+                });
+              }
             });
+          } else if (slideData.points.length <= MAX_POINTS_PER_SLIDE) {
+            // --- agak banyak poin, font lebih kecil ---
+            slideData.points.forEach((p, idx) => {
+              s.addText(`• ${p.bullet}`, {
+                x: 0.5,
+                y: 1.0 + idx * 0.9,
+                w: 5.0,
+                h: 0.5,
+                fontSize: 16,
+                bold: true,
+                color: "1F497D",
+              });
+              if (p.desc) {
+                s.addText(p.desc, {
+                  x: 1.0,
+                  y: 1.3 + idx * 0.9,
+                  w: 4.5,
+                  h: 0.5,
+                  fontSize: 12,
+                  color: "444444",
+                });
+              }
+            });
+          } else {
+            // --- poin terlalu banyak, auto split ke slide tambahan ---
+            for (let i = 0; i < slideData.points.length; i += MAX_POINTS_PER_SLIDE) {
+              const chunk = slideData.points.slice(i, i + MAX_POINTS_PER_SLIDE);
+
+              const extraSlide = i === 0 ? s : pptx.addSlide();
+              if (i > 0) {
+                extraSlide.background = s.background;
+                extraSlide.addText(slideData.title + " (lanjutan)", {
+                  x: 0.5,
+                  y: 0.5,
+                  w: 8.5,
+                  h: 0.8,
+                  fontSize: 24,
+                  bold: true,
+                  color: "1F497D",
+                  align: "center",
+                });
+              }
+
+              chunk.forEach((p, idx) => {
+                extraSlide.addText(`• ${p.bullet}`, {
+                  x: 0.5,
+                  y: 1.0 + idx * 0.9,
+                  w: 5.0,
+                  h: 0.5,
+                  fontSize: 16,
+                  bold: true,
+                  color: "1F497D",
+                });
+                if (p.desc) {
+                  extraSlide.addText(p.desc, {
+                    x: 1.0,
+                    y: 1.3 + idx * 0.9,
+                    w: 4.5,
+                    h: 0.5,
+                    fontSize: 12,
+                    color: "444444",
+                  });
+                }
+              });
+            }
           }
-        });
+        }
 
         // Gambar dari DALL·E
         if (apiKey) {

@@ -205,6 +205,7 @@ export default function ContentGenerator() {
   const [isSearchingVideos, setIsSearchingVideos] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pptBlob, setPptBlob] = useState<Blob | null>(null);
+  const [previewContent, setPreviewContent] = useState<GeneratedContent | null>(null);
 
 
   // API Key management
@@ -348,6 +349,9 @@ PEDOMAN:
 - Sertakan contoh praktis dan relevan
 - Berikan catatan presenter yang membantu
 - Fokus pada pembelajaran yang efektif
+- WAJIB gunakan simbol matematika standar (Unicode) untuk materi matematika.
+  Contoh: ×, ÷, √, ∑, ∫, ≤, ≥, ≠, π, ∞
+- Jika rumus kompleks, berikan juga representasi LaTeX pada "notes"
 - WAJIB berikan output dalam format JSON yang valid`;
 
         userPrompt = `Buatkan presentasi pembelajaran tentang "${topic}" untuk mata pelajaran ${subject} tingkat ${level}. 
@@ -984,7 +988,10 @@ PEDOMAN:
                           <span>Waktu pembuatan: {content.content.estimatedTime}</span>
                         </div>
                         <div className="flex space-x-3 pt-4">
-                          <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
+                          <Button 
+                            onClick={() => setPreviewContent(content)}
+                            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                          >
                             <Eye className="h-4 w-4 mr-2" />
                             Lihat Konten
                           </Button>
@@ -1016,6 +1023,30 @@ PEDOMAN:
                     </CardContent>
                   </Card>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {previewContent && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white w-[800px] h-[600px] rounded-xl overflow-y-auto p-6">
+                <h2 className="text-2xl font-bold mb-4">{previewContent.title}</h2>
+                
+                {previewContent.content.slides.map((slide, idx) => (
+                  <div key={idx} className="mb-6 border-b pb-4">
+                    <h3 className="text-xl font-semibold text-blue-600">{slide.title}</h3>
+                    {slide.points?.map((p, i) => (
+                      <div key={i} className="ml-4 mt-2">
+                        <p className="font-bold">• {p.bullet}</p>
+                        {p.desc && <p className="text-gray-600 ml-4">{p.desc}</p>}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+
+                <div className="flex justify-end mt-4">
+                  <Button onClick={() => setPreviewContent(null)}>Tutup</Button>
+                </div>
               </div>
             </div>
           )}
