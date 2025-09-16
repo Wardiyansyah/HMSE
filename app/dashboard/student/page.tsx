@@ -332,7 +332,7 @@ export default function EduGenAIDashboard() {
               </CardHeader>
               <CardContent>
                 <Tabs defaultValue="content-generator" className="w-full">
-                  <TabsList className="grid w-full h-full grid-cols-2 lg:grid-cols-4">
+                  <TabsList className="grid w-full h-full grid-cols-3">
                     <TabsTrigger value="content-generator" className="text-xs">
                       {t('nav.content-generator')}
                     </TabsTrigger>
@@ -341,9 +341,6 @@ export default function EduGenAIDashboard() {
                     </TabsTrigger>
                     <TabsTrigger value="assessment" className="text-xs">
                       Assessment
-                    </TabsTrigger>
-                    <TabsTrigger value="analytics" className="text-xs">
-                      {t('nav.analytics')}
                     </TabsTrigger>
                   </TabsList>
 
