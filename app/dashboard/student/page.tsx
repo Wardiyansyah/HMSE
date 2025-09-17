@@ -332,10 +332,7 @@ export default function EduGenAIDashboard() {
               </CardHeader>
               <CardContent>
                 <Tabs defaultValue="content-generator" className="w-full">
-                  <TabsList className="grid w-full h-full grid-cols-3">
-                    <TabsTrigger value="content-generator" className="text-xs">
-                      {t('nav.content-generator')}
-                    </TabsTrigger>
+                  <TabsList className="grid w-full h-full grid-cols-2">
                     <TabsTrigger value="adaptive-learning" className="text-xs">
                       Adaptive Path
                     </TabsTrigger>

@@ -40,7 +40,7 @@ import {
 } from 'lucide-react';
 
 interface GeneratedContent {
-  type: 'presentation' | 'quiz' | 'material' | 'video' | 'package';
+  type: 'presentation' | 'quiz' | 'video';
   title: string;
   content: any;
   timestamp: Date;
@@ -85,18 +85,9 @@ const contentTypes: ContentType[] = [
     description: 'Soal pilihan ganda + essay',
     icon: <HelpCircle className="h-6 w-6" />,
     color: 'from-orange-500 to-red-500',
-    features: ['10-20 Soal', 'Pembahasan Lengkap', 'Skor Otomatis'],
+    features: ['10-20 Soal', 'Pembahasan Lengkap'],
     estimatedTime: '1-2 menit',
-  },
-  // {
-  //   id: 'material',
-  //   title: 'Materi Bacaan',
-  //   description: 'Dokumen pembelajaran lengkap',
-  //   icon: <BookOpen className="h-6 w-6" />,
-  //   color: 'from-indigo-500 to-purple-500',
-  //   features: ['Format PDF', 'Ilustrasi', 'Ringkasan'],
-  //   estimatedTime: '2-4 menit',
-  // },
+  }
 ];
 
 const subjects = [
@@ -206,7 +197,7 @@ export default function ContentGenerator() {
   const [error, setError] = useState<string | null>(null);
   const [pptBlob, setPptBlob] = useState<Blob | null>(null);
   const [previewContent, setPreviewContent] = useState<GeneratedContent | null>(null);
-
+  const [previewQuiz, setPreviewQuiz] = useState<any | null>(null);
 
   // API Key management
   const [apiKey, setApiKey] = useState<string | null>(null);
@@ -299,13 +290,20 @@ export default function ContentGenerator() {
   };
 
 
-  function cleanJSONResponse(responseText) {
-    return responseText
-      .replace(/^```json\s*/i, "") // remove starting ```json
-      .replace(/^```\s*/i, "")     // in case it's just ``` without json
-      .replace(/\s*```$/i, "")     // remove ending ```
-      .trim();
-  }
+  function cleanJSONResponse(responseText: string) {
+  let cleaned = responseText
+    .replace(/```json/gi, "")
+    .replace(/```/g, "")
+    .trim();
+
+    const start = cleaned.indexOf("{");
+    const end = cleaned.lastIndexOf("}");
+    if (start !== -1 && end !== -1) {
+      cleaned = cleaned.substring(start, end + 1);
+    }
+
+    return cleaned;
+}
 
   const generateAIContent = async (): Promise<any> => {
     if (!apiKey) {
@@ -370,63 +368,33 @@ Tugas Anda adalah membuat kuis dalam format JSON dengan struktur berikut:
   "description": "Deskripsi kuis",
   "questions": [
     {
-      "questionNumber": 1,
-      "type": "multiple_choice",
+      "number": 1,
+      "type": "multiple_choice" | "short_answer" | "essay",
       "question": "Pertanyaan?",
       "options": ["A. Opsi 1", "B. Opsi 2", "C. Opsi 3", "D. Opsi 4"],
-      "correctAnswer": "A",
+      "answer": "A", // untuk multiple_choice & short_answer
       "explanation": "Penjelasan jawaban yang benar"
     }
   ],
-  "totalQuestions": 10,
-  "difficulty": "medium"
+  "totalQuestions": 20
 }
 
 PEDOMAN:
-- Buat 8-12 pertanyaan yang bervariasi
-- Gunakan berbagai jenis pertanyaan (pilihan ganda, benar/salah, isian)
-- Berikan penjelasan untuk setiap jawaban
+- Wajib buat total 20 soal
+- Gunakan distribusi:
+   • 10 soal multiple_choice (pilihan ganda 4 opsi, sertakan jawaban benar + penjelasan)  
+   • 5 soal short_answer (isian singkat, sertakan kunci jawaban + penjelasan)  
+   • 5 soal essay (jawaban berupa uraian panjang, jangan sertakan options maupun answer, cukup notes atau penjelasan)  
+- Gunakan bahasa Indonesia yang sesuai level siswa
 - Sesuaikan tingkat kesulitan dengan level siswa
-- Fokus pada pemahaman konsep, bukan hafalan
-- WAJIB berikan output dalam format JSON yang valid`;
+- Berikan penjelasan untuk setiap jawaban
+- Fokus pada pemahaman konsep, bukan sekadar hafalan
+- WAJIB berikan output dalam format JSON yang valid
+- Jangan sertakan tanda koma setelah elemen terakhir array atau object.
+- Jangan sertakan teks lain di luar JSON.
+- Jika soal matematika, WAJIB gunakan simbol matematika standar (Unicode).`;
 
         userPrompt = `Buatkan kuis tentang "${topic}" untuk mata pelajaran ${subject} tingkat ${level}.
-        ${additionalInstructions ? `Catatan tambahan: ${additionalInstructions}` : ''}
-        
-        Berikan output dalam format JSON yang valid.`;
-        break;
-
-      case 'material':
-        systemPrompt = `Anda adalah AI Content Generator untuk Insan AI yang ahli dalam membuat materi pembelajaran.
-
-Tugas Anda adalah membuat materi pembelajaran komprehensif dalam format JSON:
-
-{
-  "title": "Judul Materi",
-  "description": "Deskripsi materi",
-  "sections": [
-    {
-      "sectionNumber": 1,
-      "title": "Judul Bagian",
-      "content": "Konten lengkap bagian",
-      "examples": ["Contoh 1", "Contoh 2"],
-      "keyPoints": ["Poin penting 1", "Poin penting 2"]
-    }
-  ],
-  "summary": "Ringkasan materi",
-  "additionalResources": ["Resource 1", "Resource 2"],
-  "practiceExercises": ["Latihan 1", "Latihan 2"]
-}
-
-PEDOMAN:
-- Buat 4-6 bagian yang logis dan berurutan
-- Gunakan bahasa yang mudah dipahami
-- Sertakan contoh praktis dan relevan
-- Berikan ringkasan yang komprehensif
-- Tambahkan latihan untuk pemahaman
-- WAJIB berikan output dalam format JSON yang valid`;
-
-        userPrompt = `Buatkan materi pembelajaran tentang "${topic}" untuk mata pelajaran ${subject} tingkat ${level}.
         ${additionalInstructions ? `Catatan tambahan: ${additionalInstructions}` : ''}
         
         Berikan output dalam format JSON yang valid.`;
@@ -460,7 +428,17 @@ PEDOMAN:
 
     const result = await generateWithOpenAI(systemPrompt, userPrompt);
 
-    return JSON.parse(cleanJSONResponse(result));
+    const cleaned = cleanJSONResponse(result);
+
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch (e) {
+      console.error("❌ JSON parse error:", e.message);
+      throw new Error("AI mengembalikan JSON tidak valid, coba lagi.");
+    }
+
+    return parsed;
   };
 
   const simulateGeneration = async () => {
@@ -889,7 +867,7 @@ PEDOMAN:
           {/* Generated Content */}
           {generatedContent.length > 0 && !isGenerating && (
             <div className="space-y-6">
-              <div className="text-center">
+              <div className="text-center mt-4">
                 <h3 className="text-2xl font-bold mb-2">Konten Berhasil Dibuat! 🎉</h3>
                 <p className="text-gray-600 dark:text-gray-400">Konten pembelajaran Anda siap digunakan</p>
               </div>
@@ -919,7 +897,7 @@ PEDOMAN:
                         </div>
 
                         {/* Video Content Stats */}
-                        {(content.type === 'video' || content.type === 'package') && content.youtubeVideos && (
+                        {(content.type === 'video') && content.youtubeVideos && (
                           <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-700">
                             <div className="flex items-center space-x-2 mb-3">
                               <Youtube className="h-5 w-5 text-red-600" />
@@ -988,13 +966,27 @@ PEDOMAN:
                           <span>Waktu pembuatan: {content.content.estimatedTime}</span>
                         </div>
                         <div className="flex space-x-3 pt-4">
+                        {content.type === "presentation" && !content.pptBlob && (
                           <Button 
                             onClick={() => setPreviewContent(content)}
                             className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                            >
+                            <Eye className="h-4 w-4 mr-2" />
+                            Lihat Konten
+                          </Button>
+                        )}
+
+                        {content.type === "quiz" && (
+                          <Button
+                          onClick={() => setPreviewQuiz(content.content)} 
+                          className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
                           >
                             <Eye className="h-4 w-4 mr-2" />
                             Lihat Konten
                           </Button>
+                        )}
+
+                        {content.type === "presentation" && (
                           <Button
                             variant="outline"
                             onClick={() => {
@@ -1011,13 +1003,36 @@ PEDOMAN:
                             disabled={!content.pptBlob}
                           >
                             <Download className="h-4 w-4 mr-2" />
-                            Download
+                            Download PPT
                           </Button>
+                        )}
 
-                          <Button variant="outline">
+                        {content.type === "quiz" && (
+                          <Button
+                          onClick={async () => {
+                            const res = await fetch("/api/generate-quiz", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ content: content.content }), // content hasil AI
+                              });
+                              const blob = await res.blob();
+                              const url = window.URL.createObjectURL(blob);
+                              const a = document.createElement("a");
+                              a.href = url;
+                              a.download = "quiz.pdf";
+                              a.click();
+                              window.URL.revokeObjectURL(url);
+                            }}
+                            >
+                            <Download className="h-4 w-4 mr-2" />
+                            Download Quiz
+                          </Button>
+                        )}
+
+                          {/* <Button variant="outline">
                             <Share2 className="h-4 w-4 mr-2" />
                             Bagikan
-                          </Button>
+                          </Button> */}
                         </div>
                       </div>
                     </CardContent>
@@ -1046,6 +1061,45 @@ PEDOMAN:
 
                 <div className="flex justify-end mt-4">
                   <Button onClick={() => setPreviewContent(null)}>Tutup</Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {previewQuiz && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white w-[800px] h-[600px] rounded-xl overflow-y-auto p-6">
+                <h2 className="text-2xl font-bold mb-4">{previewQuiz.title}</h2>
+                <p className="text-gray-600 mb-6">{previewQuiz.description}</p>
+
+                {previewQuiz.questions?.map((q: any, idx: number) => (
+                  <div key={idx} className="mb-6 border-b pb-4">
+                    <h3 className="font-semibold text-lg">
+                      {idx + 1}. {q.question}
+                    </h3>
+
+                    {q.options && Array.isArray(q.options) && (
+                      <ul className="list-disc ml-6 mt-2">
+                        {q.options.map((opt: string, i: number) => (
+                          <li key={i}>{opt}</li>
+                        ))}
+                      </ul>
+                    )}
+
+                    <p className="mt-2 text-green-600 font-medium">
+                      Jawaban: {q.correctAnswer}
+                    </p>
+
+                    {q.explanation && (
+                      <p className="mt-1 text-gray-500 text-sm">
+                        {q.explanation}
+                      </p>
+                    )}
+                  </div>
+                ))}
+
+                <div className="flex justify-end mt-4">
+                  <Button onClick={() => setPreviewQuiz(null)}>Tutup</Button>
                 </div>
               </div>
             </div>
