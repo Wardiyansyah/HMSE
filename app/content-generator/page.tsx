@@ -68,7 +68,7 @@ const contentTypes: ContentType[] = [
     icon: <PresentationChart className="h-6 w-6" />,
     color: 'from-blue-500 to-cyan-500',
     features: ['10-15 Slide', 'Animasi Menarik', 'Template Modern'],
-    estimatedTime: '2-3 menit',
+    estimatedTime: '8-10 menit',
   },
   {
     id: 'video',
@@ -198,6 +198,7 @@ export default function ContentGenerator() {
   const [pptBlob, setPptBlob] = useState<Blob | null>(null);
   const [previewContent, setPreviewContent] = useState<GeneratedContent | null>(null);
   const [previewQuiz, setPreviewQuiz] = useState<any | null>(null);
+  const [withIllustration, setWithIllustration] = useState(true);
 
   // API Key management
   const [apiKey, setApiKey] = useState<string | null>(null);
@@ -508,6 +509,7 @@ PEDOMAN:
             body: JSON.stringify({
               content: newContent.content,
               apiKey: apiKey,
+              withIllustration,
             }),
           });
 
@@ -753,6 +755,18 @@ PEDOMAN:
                     className="text-base"
                   />
                 </div>
+                <div className="flex items-center space-x-2 mt-3">
+                  <input
+                    id="withIllustration"
+                    type="checkbox"
+                    checked={withIllustration}
+                    onChange={(e) => setWithIllustration(e.target.checked)}
+                    className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                  />
+                  <label htmlFor="withIllustration" className="text-sm text-gray-700">
+                    Tambahkan ilustrasi ke dalam PPT
+                  </label>
+                </div>
 
                 {subject && level && (
                   <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 p-4 rounded-lg">
@@ -819,8 +833,8 @@ PEDOMAN:
                           </ul>
                         </div>
                         {(type.id === 'video' || type.id === 'package') && (
-                          <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg border border-red-200 dark:border-red-700">
-                            <div className="flex items-center space-x-2 text-red-800 dark:text-red-300">
+                          <div className="bg-primary-50 dark:bg-primary-900/20 p-3 rounded-lg border border-primary-200 dark:border-primary-700">
+                            <div className="flex items-center space-x-2 text-Primary-800 dark:text-red-300">
                               <Youtube className="h-4 w-4" />
                               <span className="text-xs font-medium">Otomatis mencari video YouTube terkait</span>
                             </div>

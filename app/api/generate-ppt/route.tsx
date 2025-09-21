@@ -39,7 +39,7 @@ async function fetchBase64Image(prompt: string, apiKey: string): Promise<string 
 
 export async function POST(req: Request) {
   try {
-    const { content, apiKey } = await req.json();
+    const { content, apiKey, withIllustration } = await req.json();
     const pptx = new PptxGenJS();
 
     // Cover
@@ -176,7 +176,7 @@ export async function POST(req: Request) {
         }
 
         // Gambar dari DALL·E
-        if (apiKey) {
+        if (withIllustration && apiKey) {
           const imgPrompt = `Ilustrasi edukatif sederhana tentang ${slideData.title}, gaya flat design minimalis`;
           const base64Image = await fetchBase64Image(imgPrompt, apiKey);
           if (base64Image) {
