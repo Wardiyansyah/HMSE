@@ -27,8 +27,8 @@ export function NavigationHeaderGuest() {
           <div className="flex items-center space-x-4">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
-                <Brain className="h-5 w-5 text-white" />
+              <div className="p-2 rounded-lg">
+                <img src=".\logo\insanAI.png" alt="insanAI-Logo" className="h-14 w-14" />
               </div>
               <div className="hidden sm:block">
                 <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">InsanAI</h2>
