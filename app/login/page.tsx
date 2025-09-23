@@ -164,10 +164,6 @@ export default function LoginPage() {
                   <span>Guru:</span>
                   <span className="font-mono">samsudin / password123</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Admin:</span>
-                  <span className="font-mono">dalam pengembangan</span>
-                </div>
               </div>
             </div>
           </CardContent>
