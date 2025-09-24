@@ -103,6 +103,17 @@ export function NavigationHeader() {
                     </DropdownMenuItem>
                   ))}
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings" className="flex items-center space-x-3 p-3 cursor-pointer">
+                      <div className="p-1.5 bg-gray-100 rounded-md">
+                        <Settings className="h-4 w-4 text-gray-600" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-sm">Pengaturan</div>
+                        <div className="text-xs text-gray-500 mt-0.5">Kelola profil dan preferensi</div>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
