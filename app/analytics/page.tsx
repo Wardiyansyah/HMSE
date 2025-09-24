@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { NavigationHeader } from '@/components/navigation-header-student';
+import { NavigationHeader } from '@/components/navigation-header-teacher';
 import { useLanguage } from '@/lib/language-context';
 import { BarChart3, TrendingUp, TrendingDown, Users, BookOpen, Clock, Award, AlertTriangle, CheckCircle, Target } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';

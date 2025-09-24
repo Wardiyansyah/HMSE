@@ -24,21 +24,20 @@ export default function Library() {
 
   const categories = [
     { value: 'all', label: t('library.all-categories') },
-    { value: 'matematika', label: t('subject.matematika') },
-    { value: 'fisika', label: t('subject.fisika') },
-    { value: 'kimia', label: t('subject.kimia') },
-    { value: 'biologi', label: t('subject.biologi') },
-    { value: 'bahasa', label: t('subject.bahasa') },
-    { value: 'sejarah', label: t('subject.sejarah') },
-    { value: 'geografi', label: t('subject.geografi') },
+    { value: 'matematika', label: t('matematika') },
+    { value: 'fisika', label: t('fisika') },
+    { value: 'kimia', label: t('kimia') },
+    { value: 'biologi', label: t('biologi') },
+    { value: 'bahasa', label: t('bahasa') },
+    { value: 'sejarah', label: t('sejarah') },
+    { value: 'geografi', label: t('geografi') },
   ];
 
   const levels = [
     { value: 'all', label: t('library.all-levels') },
-    { value: 'sd', label: t('level.sd') },
-    { value: 'smp', label: t('level.smp') },
-    { value: 'sma', label: t('level.sma') },
-    { value: 'kuliah', label: t('level.kuliah') },
+    { value: 'sd', label: t('sd') },
+    { value: 'smp', label: t('smp') },
+    { value: 'sma', label: t('sma') },
   ];
 
   // Load videos when category or level changes
@@ -69,13 +68,13 @@ export default function Library() {
 
   const getCategoryDefaultTopic = (category: string): string => {
     const defaultTopics: { [key: string]: string } = {
-      matematika: t('subject.matematika'),
-      fisika: t('subject.fisika'),
-      kimia: t('subject.kimia'),
-      biologi: t('subject.biologi'),
-      bahasa: t('subject.bahasa'),
-      sejarah: t('subject.sejarah'),
-      geografi: t('subject.geografi'),
+      matematika: t('matematika'),
+      fisika: t('fisika'),
+      kimia: t('kimia'),
+      biologi: t('biologi'),
+      bahasa: t('bahasa'),
+      sejarah: t('sejarah'),
+      geografi: t('geografi'),
     };
     return defaultTopics[category] || t('common.learning'); // Assuming 'common.learning' exists
   };
@@ -248,7 +247,7 @@ export default function Library() {
                     ))}
                   </SelectContent>
                 </Select>
-                {/* <Select value={selectedLevel} onValueChange={setSelectedLevel}>
+                <Select value={selectedLevel} onValueChange={setSelectedLevel}>
                   <SelectTrigger className="w-32">
                     <SelectValue />
                   </SelectTrigger>
@@ -259,8 +258,8 @@ export default function Library() {
                       </SelectItem>
                     ))}
                   </SelectContent>
-                </Select> */}
-                <Button onClick={handleSearch} disabled={selectedCategory === 'all' || selectedLevel === 'all'}>
+                </Select>
+                <Button onClick={handleSearch} disabled={selectedCategory === 'all'}>
                   <Search className="h-4 w-4" />
                 </Button>
               </div>

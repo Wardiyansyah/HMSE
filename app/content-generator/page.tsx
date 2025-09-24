@@ -11,8 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { useAppStore } from '@/lib/store';
-import { NavigationHeader } from '@/components/navigation-header-student';
-import { searchYouTubeVideos, type YouTubeVideo, type SearchParams } from '@/lib/youtube-api';
+import { NavigationHeader } from '@/components/navigation-header-teacher';
 import {
   RefreshCw,
   Sparkles,
@@ -46,8 +45,8 @@ interface GeneratedContent {
   timestamp: Date;
   status: 'generating' | 'completed' | 'error';
   progress: number;
-  youtubeVideos?: YouTubeVideo[];
   pptBlob?: Blob;
+  videoUrl?: string;
 }
 
 interface ContentType {
@@ -73,10 +72,10 @@ const contentTypes: ContentType[] = [
   {
     id: 'video',
     title: 'Video Pembelajaran',
-    description: 'Video edukatif dari YouTube',
+    description: 'Video edukatif hasil generate AI',
     icon: <Video className="h-6 w-6" />,
     color: 'from-red-500 to-pink-500',
-    features: ['Video Berkualitas Tinggi', 'Dari Channel Terpercaya', 'Durasi Optimal', 'Subtitle Indonesia'],
+    features: ['Video Berkualitas Tinggi', 'Script Terstruktur',],
     estimatedTime: '3-5 menit',
   },
   {
@@ -199,6 +198,9 @@ export default function ContentGenerator() {
   const [previewContent, setPreviewContent] = useState<GeneratedContent | null>(null);
   const [previewQuiz, setPreviewQuiz] = useState<any | null>(null);
   const [withIllustration, setWithIllustration] = useState(true);
+  const [videoScript, setVideoScript] = useState<any | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
 
   // API Key management
   const [apiKey, setApiKey] = useState<string | null>(null);
@@ -267,29 +269,6 @@ export default function ContentGenerator() {
     const data = await response.json();
     return data.choices[0]?.message?.content || 'Tidak ada respons dari AI';
   };
-
-  const searchYouTubeContent = async (): Promise<YouTubeVideo[]> => {
-    if (!topic.trim() || !subject || !level) return [];
-
-    setIsSearchingVideos(true);
-    try {
-      const searchParams: SearchParams = {
-        category: subject,
-        level: level,
-        topic: topic,
-        maxResults: 5,
-      };
-
-      const videos = await searchYouTubeVideos(searchParams);
-      return videos;
-    } catch (error) {
-      console.error('Error searching YouTube videos:', error);
-      return [];
-    } finally {
-      setIsSearchingVideos(false);
-    }
-  };
-
 
   function cleanJSONResponse(responseText: string) {
   let cleaned = responseText
@@ -442,6 +421,22 @@ PEDOMAN:
     return parsed;
   };
 
+  async function generateVideoWithVeo(prompt: string): Promise<string> {
+    try {
+      const res = await fetch("/api/generate-video", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+      if (!res.ok) throw new Error("Gagal generate video");
+      const data = await res.json();
+      return data.videoUrl; // ini di-return dari route.ts
+    } catch (err) {
+      console.error("Error generate video:", err);
+      throw err;
+    }
+  }
+
   const simulateGeneration = async () => {
     if (!topic.trim() || !subject || !level || !contentType) return;
 
@@ -459,11 +454,11 @@ PEDOMAN:
       await new Promise((resolve) => setTimeout(resolve, 800));
       setGenerationProgress(20);
 
-      // Step 2: Search YouTube videos if content type is video or package
-      let youtubeVideos: YouTubeVideo[] = [];
-      if (contentType === 'video' || contentType === 'package') {
+      // Step 2: Generate video kalau contentType === 'video'
+      let videoUrl: string | undefined;
+      if (contentType === "video") {
         setGenerationProgress(40);
-        youtubeVideos = await searchYouTubeContent();
+        videoUrl = await generateVideoWithVeo(topic);
         setGenerationProgress(60);
       } else {
         setGenerationProgress(60);
@@ -486,17 +481,11 @@ PEDOMAN:
           ...aiContent,
           estimatedTime: contentTypes.find((ct) => ct.id === contentType)?.estimatedTime || '3-5 menit',
           features: contentTypes.find((ct) => ct.id === contentType)?.features || [],
-          videoCount: youtubeVideos.length,
-          totalDuration: youtubeVideos.reduce((total, video) => {
-            const duration = video.duration.split(':');
-            return total + Number.parseInt(duration[0]) * 60 + Number.parseInt(duration[1]);
-          }, 0),
-          channels: [...new Set(youtubeVideos.map((v) => v.channelTitle))],
         },
         timestamp: new Date(),
         status: 'completed',
         progress: 100,
-        youtubeVideos: youtubeVideos.length > 0 ? youtubeVideos : undefined,
+        videoUrl: videoUrl || undefined,
       };
 
       setGeneratedContent((prev) => [newContent, ...prev]);
@@ -606,10 +595,6 @@ PEDOMAN:
               <Badge variant="secondary" className="bg-green-100 text-green-800 px-4 py-2">
                 <Target className="h-4 w-4 mr-2" />
                 Disesuaikan Kebutuhan
-              </Badge>
-              <Badge variant="secondary" className="bg-red-100 text-red-800 px-4 py-2">
-                <Youtube className="h-4 w-4 mr-2" />
-                Integrasi YouTube
               </Badge>
             </div>
           </div>
@@ -832,14 +817,6 @@ PEDOMAN:
                             ))}
                           </ul>
                         </div>
-                        {(type.id === 'video' || type.id === 'package') && (
-                          <div className="bg-primary-50 dark:bg-primary-900/20 p-3 rounded-lg border border-primary-200 dark:border-primary-700">
-                            <div className="flex items-center space-x-2 text-Primary-800 dark:text-red-300">
-                              <Youtube className="h-4 w-4" />
-                              <span className="text-xs font-medium">Otomatis mencari video YouTube terkait</span>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -864,12 +841,6 @@ PEDOMAN:
                     <p className="text-gray-600 dark:text-gray-400 mb-4">
                       Membuat {getContentTypeTitle(contentType).toLowerCase()} untuk "{topic}"
                     </p>
-                    {(contentType === 'video' || contentType === 'package') && isSearchingVideos && (
-                      <div className="flex items-center justify-center space-x-2 text-red-600 dark:text-red-400 mb-2">
-                        <Youtube className="h-4 w-4 animate-pulse" />
-                        <span className="text-sm">Mencari video YouTube terkait...</span>
-                      </div>
-                    )}
                     <Progress value={generationProgress} className="w-full h-3" />
                     <p className="text-sm text-gray-500 mt-2">{generationProgress}% selesai</p>
                   </div>
@@ -909,71 +880,6 @@ PEDOMAN:
                             </div>
                           ))}
                         </div>
-
-                        {/* Video Content Stats */}
-                        {(content.type === 'video') && content.youtubeVideos && (
-                          <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-700">
-                            <div className="flex items-center space-x-2 mb-3">
-                              <Youtube className="h-5 w-5 text-red-600" />
-                              <h4 className="font-semibold text-red-800 dark:text-red-300">Video Pembelajaran Ditemukan</h4>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                              <div className="flex items-center space-x-2">
-                                <Video className="h-4 w-4 text-red-500" />
-                                <span>{content.youtubeVideos.length} video berkualitas</span>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Clock className="h-4 w-4 text-red-500" />
-                                <span>Total durasi: {formatDuration(content.content.totalDuration || 0)}</span>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Users className="h-4 w-4 text-red-500" />
-                                <span>{content.content.channels?.length || 0} channel terpercaya</span>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* YouTube Videos List */}
-                        {content.youtubeVideos && content.youtubeVideos.length > 0 && (
-                          <div className="space-y-4">
-                            <h4 className="font-semibold text-lg flex items-center space-x-2">
-                              <Youtube className="h-5 w-5 text-red-600" />
-                              <span>Video Pembelajaran Terpilih</span>
-                            </h4>
-                            <div className="grid gap-4">
-                              {content.youtubeVideos.map((video, videoIndex) => (
-                                <div key={videoIndex} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                                  <div className="flex space-x-4">
-                                    <div className="relative flex-shrink-0">
-                                      <img src={video.thumbnail || '/placeholder.svg'} alt={video.title} className="w-32 h-20 object-cover rounded-lg" />
-                                      <div className="absolute inset-0 flex items-center justify-center">
-                                        <div className="bg-black/70 rounded-full p-2">
-                                          <Play className="h-4 w-4 text-white" />
-                                        </div>
-                                      </div>
-                                      <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">{video.duration}</div>
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                      <h5 className="font-medium text-sm mb-1 line-clamp-2">{video.title}</h5>
-                                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">{video.description}</p>
-                                      <div className="flex items-center justify-between text-xs text-gray-500">
-                                        <span>{video.channelTitle}</span>
-                                        <span>{video.viewCount} views</span>
-                                      </div>
-                                    </div>
-                                    <div className="flex flex-col space-y-2">
-                                      <Button size="sm" variant="outline" className="text-red-600 border-red-200 hover:bg-red-50 bg-transparent" onClick={() => window.open(video.url, '_blank')}>
-                                        <ExternalLink className="h-3 w-3 mr-1" />
-                                        Tonton
-                                      </Button>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
 
                         <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
                           <Clock className="h-4 w-4" />
@@ -1043,11 +949,49 @@ PEDOMAN:
                           </Button>
                         )}
 
+                         {/* Download Video */}
+                        {content.videoUrl && (
+                          <Button
+                            variant="outline"
+                            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                            onClick={async () => {
+                              try {
+                                const res = await fetch(content.videoUrl);
+                                const blob = await res.blob();
+                                const url = window.URL.createObjectURL(blob);
+                                const a = document.createElement("a");
+                                a.href = url;
+                                a.download = `${content.title || "Video"}.mp4`;
+                                document.body.appendChild(a);
+                                a.click();
+                                a.remove();
+                                window.URL.revokeObjectURL(url);
+                              } catch (err) {
+                                alert("Gagal mendownload video");
+                                console.error(err);
+                              }
+                            }}
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Download Video
+                          </Button>
+                        )}
+
+
                           {/* <Button variant="outline">
                             <Share2 className="h-4 w-4 mr-2" />
                             Bagikan
-                          </Button> */}
+                            </Button> */}
                         </div>
+                            {content.videoUrl && (
+                              <div className="mt-4">
+                                <video controls className="w-full rounded-lg shadow">
+                                  <source src={content.videoUrl}/>
+                                  console.log("Video URL dipakai:", content.videoUrl);
+                                  Browser Anda tidak mendukung video tag.
+                                </video>
+                              </div>
+                            )}
                       </div>
                     </CardContent>
                   </Card>
