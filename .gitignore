@@ -36,5 +36,5 @@ yarn-error.log*
 # Lerna
 lerna-debug.log*
 
-# Optional
-*.tsbuildinfo
+# Ignore folder keys
+keys

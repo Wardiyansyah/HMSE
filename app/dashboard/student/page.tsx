@@ -331,7 +331,7 @@ export default function EduGenAIDashboard() {
                 <CardDescription className="text-sm md:text-base">{t('dashboard.features.subtitle')}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Tabs defaultValue="content-generator" className="w-full">
+                <Tabs defaultValue="adaptive-learning" className="w-full">
                   <TabsList className="grid w-full h-full grid-cols-2">
                     <TabsTrigger value="adaptive-learning" className="text-xs">
                       Adaptive Path
@@ -340,25 +340,6 @@ export default function EduGenAIDashboard() {
                       Assessment
                     </TabsTrigger>
                   </TabsList>
-
-                  <TabsContent value="content-generator" className="space-y-4">
-                    <div className="p-4 border rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-                      <h4 className="font-semibold mb-2 flex items-center">
-                        <Brain className="h-4 w-4 mr-2 text-blue-600" />
-                        {t('nav.content-generator')}
-                      </h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Buat materi ajar otomatis sesuai kurikulum dengan AI</p>
-                      <div className="bg-white dark:bg-card p-3 rounded border dark:border-gray-700 text-sm">
-                        <strong>Contoh:</strong> Input "Fotosintesis" → AI generate PPT, video pendek, dan 10 soal pilihan ganda
-                      </div>
-                      <Link href="/content-generator">
-                        <Button className="mt-3" size="sm">
-                          <Zap className="h-4 w-4 mr-2" />
-                          Coba Sekarang
-                        </Button>
-                      </Link>
-                    </div>
-                  </TabsContent>
 
                   <TabsContent value="adaptive-learning" className="space-y-4">
                     <div className="p-4 border rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
@@ -393,25 +374,6 @@ export default function EduGenAIDashboard() {
                         <Button className="mt-3" size="sm">
                           <FileText className="h-4 w-4 mr-2" />
                           Mulai Assessment
-                        </Button>
-                      </Link>
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="analytics" className="space-y-4">
-                    <div className="p-4 border rounded-lg bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20">
-                      <h4 className="font-semibold mb-2 flex items-center">
-                        <BarChart3 className="h-4 w-4 mr-2 text-orange-600" />
-                        {t('nav.analytics')}
-                      </h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Dashboard untuk memantau perkembangan belajar</p>
-                      <div className="bg-white dark:bg-card p-3 rounded border dark:border-gray-700 text-sm">
-                        <strong>Contoh:</strong> Grafik area lemah siswa: "Aljabar perlu lebih banyak latihan"
-                      </div>
-                      <Link href="/analytics">
-                        <Button className="mt-3" size="sm">
-                          <BarChart3 className="h-4 w-4 mr-2" />
-                          Buka Analytics
                         </Button>
                       </Link>
                     </div>
@@ -479,18 +441,6 @@ export default function EduGenAIDashboard() {
                 <CardTitle className="text-lg">{t('dashboard.quick-actions')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Link href="/content-generator">
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
-                    <Brain className="h-4 w-4 mr-2" />
-                    {t('content-generator.generate')}
-                  </Button>
-                </Link>
-                <Link href="/analytics">
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
-                    <BarChart3 className="h-4 w-4 mr-2" />
-                    {t('common.open')} {t('nav.analytics')}
-                  </Button>
-                </Link>
                 <Link href="/virtual-tutor">
                   <Button variant="outline" className="w-full justify-start bg-transparent">
                     <MessageCircle className="h-4 w-4 mr-2" />

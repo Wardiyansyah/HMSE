@@ -21,12 +21,6 @@ const menuItems = [
     description: 'Halaman utama dan overview',
   },
   {
-    title: 'AI Content Generator',
-    url: '/content-generator',
-    icon: Sparkles,
-    description: 'Buat materi pembelajaran dengan AI',
-  },
-  {
     title: 'Virtual Tutor',
     url: '/virtual-tutor',
     icon: MessageCircle,

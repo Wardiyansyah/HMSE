@@ -89,16 +89,9 @@ export default function SettingsPage() {
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-5">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="profile">{t('settings.profile')}</TabsTrigger>
             <TabsTrigger value="preferences">{t('settings.preferences')}</TabsTrigger>
-            <TabsTrigger value="notifications">{t('settings.notifications')}</TabsTrigger>
-            <TabsTrigger value="ai-settings" className="hidden md:inline-flex">
-              {t('settings.ai-settings')}
-            </TabsTrigger>
-            <TabsTrigger value="data" className="hidden md:inline-flex">
-              {t('settings.data')}
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile" className="space-y-6">
@@ -146,20 +139,6 @@ export default function SettingsPage() {
                     <Label htmlFor="email">{t('settings.email')}</Label>
                     <Input id="email" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="role">{t('settings.role')}</Label>
-                    <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value as any })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="student">{t('common.student')}</SelectItem>
-                        <SelectItem value="teacher">{t('common.teacher')}</SelectItem>
-                        <SelectItem value="professional">{t('common.professional')}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {/* Removed Phone Number field */}
                 </div>
 
                 <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
@@ -183,7 +162,7 @@ export default function SettingsPage() {
           </TabsContent>
 
           <TabsContent value="preferences" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2 text-lg">
@@ -243,265 +222,6 @@ export default function SettingsPage() {
                       <div className="w-4 h-4 bg-purple-500 rounded"></div>
                       <div className="w-4 h-4 bg-green-500 rounded"></div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2 text-lg">
-                    <Globe className="h-5 w-5" />
-                    <span>{t("settings.language-region")}</span>
-                  </CardTitle>
-                  <CardDescription className="text-sm">{t("settings.language-region.subtitle")}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>{t("settings.language")}</Label>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t("settings.language.subtitle")}</p>
-                    </div>
-                    <Select value={language} onValueChange={handleLanguageChange}>
-                      <SelectTrigger className="w-32">
-                        <SelectValue>
-                          <span>
-                            {language === "id" && t("settings.language.id")}
-                            {language === "en" && t("settings.language.en")}
-                          </span>
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="id">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-lg">🇮🇩</span>
-                            <span>{t("settings.language.id")}</span>
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="en">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-lg">🇺🇸</span>
-                            <span>{t("settings.language.en")}</span>
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div> */}
-
-              {/* Language Preview */}
-              {/* <div className="mt-4 p-4 border dark:border-gray-700 rounded-lg bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20">
-                    <h4 className="font-semibold mb-2">
-                      {language === "id" ? t("common.language-preview") : t("common.language-preview")}
-                    </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {language === "id" ? t("common.id-interface-description") : t("common.en-interface-description")}
-                    </p>
-                    <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                      {language === "id"
-                        ? t("common.changes-applied-automatically")
-                        : t("common.changes-applied-automatically")}
-                    </div>
-                  </div>
-                </CardContent> */}
-              {/* </Card> */}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="notifications" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-lg">
-                  <Bell className="h-5 w-5" />
-                  <span>{t('settings.notifications')}</span>
-                </CardTitle>
-                <CardDescription className="text-sm">Kelola notifikasi yang ingin Anda terima</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Notifikasi Push</Label>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Terima notifikasi di perangkat Anda</p>
-                  </div>
-                  <Switch checked={user?.preferences.notifications} onCheckedChange={(checked) => handlePreferenceChange('notifications', checked)} />
-                </div>
-
-                <Separator />
-
-                <div className="space-y-4">
-                  <h4 className="font-medium">Jenis Notifikasi</h4>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>Tugas Baru</Label>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Notifikasi saat ada tugas atau materi baru</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>Pengingat Belajar</Label>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Pengingat untuk melanjutkan pembelajaran</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>Pencapaian</Label>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Notifikasi saat mencapai milestone</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>Diskusi</Label>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Balasan dan mention dalam diskusi</p>
-                    </div>
-                    <Switch />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="ai-settings" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-lg">
-                  <Brain className="h-5 w-5" />
-                  <span>Pengaturan AI</span>
-                </CardTitle>
-                <CardDescription className="text-sm">Konfigurasi fitur AI dan pembelajaran adaptif</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>AI Assistant</Label>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Aktifkan bantuan AI untuk pembelajaran</p>
-                  </div>
-                  <Switch checked={user?.preferences.aiAssistance} onCheckedChange={(checked) => handlePreferenceChange('aiAssistance', checked)} />
-                </div>
-
-                <Separator />
-
-                <div className="space-y-4">
-                  <h4 className="font-medium">Preferensi AI</h4>
-
-                  <div className="space-y-2">
-                    <Label>Level Bantuan AI</Label>
-                    <Select defaultValue="adaptive">
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="minimal">Minimal - Hanya saat diminta</SelectItem>
-                        <SelectItem value="adaptive">Adaptif - Sesuai kebutuhan</SelectItem>
-                        <SelectItem value="proactive">Proaktif - Bantuan maksimal</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Gaya Pembelajaran</Label>
-                    <Select defaultValue="visual">
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="visual">Visual - Gambar dan diagram</SelectItem>
-                        <SelectItem value="auditory">Auditori - Audio dan penjelasan</SelectItem>
-                        <SelectItem value="kinesthetic">Kinestetik - Praktik dan simulasi</SelectItem>
-                        <SelectItem value="mixed">Campuran - Semua metode</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>Auto-Generate Content</Label>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">AI otomatis membuat konten pembelajaran</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>Smart Recommendations</Label>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Rekomendasi materi berdasarkan performa</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="data" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2 text-lg">
-                    <Shield className="h-5 w-5" />
-                    <span>Privasi & Keamanan</span>
-                  </CardTitle>
-                  <CardDescription className="text-sm">Kelola data dan privasi Anda</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>Profil Publik</Label>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Tampilkan profil di komunitas</p>
-                    </div>
-                    <Switch />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>Analitik Pembelajaran</Label>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Izinkan analisis data pembelajaran</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>Berbagi Progress</Label>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Bagikan pencapaian dengan guru/orang tua</p>
-                    </div>
-                    <Switch defaultChecked />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2 text-lg">
-                    <Download className="h-5 w-5" />
-                    <span>Data Management</span>
-                  </CardTitle>
-                  <CardDescription className="text-sm">Kelola data pembelajaran Anda</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
-                    <Download className="h-4 w-4 mr-2" />
-                    Export Data Pembelajaran
-                  </Button>
-
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Reset Progress
-                  </Button>
-
-                  <Separator />
-
-                  <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-700">
-                    <h4 className="font-semibold text-red-800 dark:text-red-300 mb-2">Zona Bahaya</h4>
-                    <p className="text-sm text-red-700 dark:text-red-400 mb-3">Tindakan ini tidak dapat dibatalkan. Pastikan Anda sudah backup data.</p>
-                    <Button variant="destructive" size="sm">
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Hapus Akun
-                    </Button>
                   </div>
                 </CardContent>
               </Card>

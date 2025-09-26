@@ -24,21 +24,20 @@ export default function Library() {
 
   const categories = [
     { value: 'all', label: t('library.all-categories') },
-    { value: 'matematika', label: t('subject.matematika') },
-    { value: 'fisika', label: t('subject.fisika') },
-    { value: 'kimia', label: t('subject.kimia') },
-    { value: 'biologi', label: t('subject.biologi') },
-    { value: 'bahasa', label: t('subject.bahasa') },
-    { value: 'sejarah', label: t('subject.sejarah') },
-    { value: 'geografi', label: t('subject.geografi') },
+    { value: 'matematika', label: t('matematika') },
+    { value: 'fisika', label: t('fisika') },
+    { value: 'kimia', label: t('kimia') },
+    { value: 'biologi', label: t('biologi') },
+    { value: 'bahasa', label: t('bahasa') },
+    { value: 'sejarah', label: t('sejarah') },
+    { value: 'geografi', label: t('geografi') },
   ];
 
   const levels = [
     { value: 'all', label: t('library.all-levels') },
-    { value: 'sd', label: t('level.sd') },
-    { value: 'smp', label: t('level.smp') },
-    { value: 'sma', label: t('level.sma') },
-    { value: 'kuliah', label: t('level.kuliah') },
+    { value: 'sd', label: t('sd') },
+    { value: 'smp', label: t('smp') },
+    { value: 'sma', label: t('sma') },
   ];
 
   // Load videos when category or level changes
@@ -69,13 +68,13 @@ export default function Library() {
 
   const getCategoryDefaultTopic = (category: string): string => {
     const defaultTopics: { [key: string]: string } = {
-      matematika: t('subject.matematika'),
-      fisika: t('subject.fisika'),
-      kimia: t('subject.kimia'),
-      biologi: t('subject.biologi'),
-      bahasa: t('subject.bahasa'),
-      sejarah: t('subject.sejarah'),
-      geografi: t('subject.geografi'),
+      matematika: t('matematika'),
+      fisika: t('fisika'),
+      kimia: t('kimia'),
+      biologi: t('biologi'),
+      bahasa: t('bahasa'),
+      sejarah: t('sejarah'),
+      geografi: t('geografi'),
     };
     return defaultTopics[category] || t('common.learning'); // Assuming 'common.learning' exists
   };
@@ -248,7 +247,7 @@ export default function Library() {
                     ))}
                   </SelectContent>
                 </Select>
-                {/* <Select value={selectedLevel} onValueChange={setSelectedLevel}>
+                <Select value={selectedLevel} onValueChange={setSelectedLevel}>
                   <SelectTrigger className="w-32">
                     <SelectValue />
                   </SelectTrigger>
@@ -259,8 +258,8 @@ export default function Library() {
                       </SelectItem>
                     ))}
                   </SelectContent>
-                </Select> */}
-                <Button onClick={handleSearch} disabled={selectedCategory === 'all' || selectedLevel === 'all'}>
+                </Select>
+                <Button onClick={handleSearch} disabled={selectedCategory === 'all'}>
                   <Search className="h-4 w-4" />
                 </Button>
               </div>
@@ -268,82 +267,6 @@ export default function Library() {
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="featured" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="featured">{t('library.featured')}</TabsTrigger>
-            <TabsTrigger value="youtube">{t('library.youtube')}</TabsTrigger>
-            <TabsTrigger value="recent">{t('library.recent')}</TabsTrigger>
-            <TabsTrigger value="popular">{t('library.popular')}</TabsTrigger>
-            <TabsTrigger value="bookmarks">{t('library.bookmarks')}</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="featured" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredContent.map((item) => (
-                <Card key={item.id} className="hover:shadow-lg transition-shadow">
-                  <div className="relative">
-                    <img src={item.thumbnail || '/placeholder.svg'} alt={item.title} className="w-full h-48 object-cover rounded-t-lg" />
-                    <div className="absolute top-3 left-3">
-                      <Badge className={`${getTypeColor(item.type)} flex items-center space-x-1`}>
-                        {getTypeIcon(item.type)}
-                        <span>{item.type}</span>
-                      </Badge>
-                    </div>
-                    <div className="absolute top-3 right-3">
-                      <Button size="icon" variant={item.isBookmarked ? 'default' : 'secondary'} className="h-8 w-8">
-                        <Bookmark className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <Badge variant="outline">{item.category}</Badge>
-                      <Badge variant="secondary">{item.level}</Badge>
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2 line-clamp-2">{item.title}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">{item.description}</p>
-                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3">
-                      <span className="flex items-center">
-                        <Clock className="h-3 w-3 mr-1" />
-                        {item.duration}
-                      </span>
-                      <span className="flex items-center">
-                        <Star className="h-3 w-3 mr-1 text-yellow-500" />
-                        {item.rating}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-4">
-                      <span className="flex items-center">
-                        <Eye className="h-3 w-3 mr-1" />
-                        {item.views.toLocaleString()} views
-                      </span>
-                      <span className="flex items-center">
-                        <Download className="h-3 w-3 mr-1" />
-                        {item.downloads} downloads
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                      {t('common.by')} {item.author}
-                    </p>
-                    <div className="flex space-x-2">
-                      <Button className="flex-1" size="sm">
-                        <Play className="h-4 w-4 mr-2" />
-                        {t('common.open')}
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <Share2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="youtube" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
@@ -428,150 +351,6 @@ export default function Library() {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="recent" className="space-y-6">
-            <div className="space-y-4">
-              {recentContent.map((item) => (
-                <Card key={item.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex items-center space-x-4">
-                      <div className={`p-3 rounded-lg ${getTypeColor(item.type)}`}>{getTypeIcon(item.type)}</div>
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <h3 className="font-semibold">{item.title}</h3>
-                          <Badge variant="outline" className="text-xs">
-                            {item.category}
-                          </Badge>
-                          <Badge variant="secondary" className="text-xs">
-                            {item.level}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
-                          <span className="flex items-center">
-                            <Clock className="h-3 w-3 mr-1" />
-                            {item.duration}
-                          </span>
-                          <span className="flex items-center">
-                            <Star className="h-3 w-3 mr-1 text-yellow-500" />
-                            {item.rating}
-                          </span>
-                          <span>
-                            {t('common.by')} {item.author}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button size="sm">
-                          <Play className="h-4 w-4 mr-2" />
-                          {t('common.open')}
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <Bookmark className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="popular" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">📈 {t('library.trending-this-week')}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div>
-                      <h4 className="font-medium">Kalkulus Diferensial</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {t('subject.matematika')} • {t('level.sma')}
-                      </p>
-                    </div>
-                    <Badge className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-300">+45%</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div>
-                      <h4 className="font-medium">Reaksi Redoks</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {t('subject.kimia')} • {t('level.sma')}
-                      </p>
-                    </div>
-                    <Badge className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-300">+38%</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div>
-                      <h4 className="font-medium">Teks Eksposisi</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {t('subject.bahasa')} • {t('level.smp')}
-                      </p>
-                    </div>
-                    <Badge className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-300">+32%</Badge>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">⭐ {t('library.highest-rated')}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div>
-                      <h4 className="font-medium">Genetika Mendel</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {t('subject.biologi')} • {t('level.sma')}
-                      </p>
-                    </div>
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                      <span className="font-medium">4.9</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div>
-                      <h4 className="font-medium">Perang Dunia II</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {t('subject.sejarah')} • {t('level.sma')}
-                      </p>
-                    </div>
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                      <span className="font-medium">4.8</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div>
-                      <h4 className="font-medium">Sistem Persamaan</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {t('subject.matematika')} • {t('level.smp')}
-                      </p>
-                    </div>
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                      <span className="font-medium">4.8</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="bookmarks" className="space-y-6">
-            <div className="text-center py-12">
-              <Bookmark className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">{t('library.no-bookmarks')}</h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-4">{t('library.no-bookmarks-description')}</p>
-              <Button>
-                <BookOpen className="h-4 w-4 mr-2" />
-                {t('library.explore-library')}
-              </Button>
-            </div>
-          </TabsContent>
-        </Tabs>
       </div>
     </div>
   );
