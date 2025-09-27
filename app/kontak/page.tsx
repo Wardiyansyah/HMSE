@@ -217,7 +217,7 @@ export default function KontakPage() {
           </div>
         </div>
       </main>
-      
+
             {/* ===== FOOTER BARU DIMULAI DI SINI ===== */}
       <footer className="bg-gray-900">
         <div className="max-w-7xl mx-auto py-12 px-6">
@@ -266,6 +266,9 @@ export default function KontakPage() {
             </svg>
           </a>
         </div>
+
+        <br></br>
+        
             <p className="text-center text-sm text-gray-500">
               © 2025 Insan AI. All rights reserved.
             </p>

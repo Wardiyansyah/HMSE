@@ -58,7 +58,7 @@ function AppSidebar() {
             <Brain className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">EduGenAI</h2>
+            <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Insan AI</h2>
             <p className="text-xs text-gray-600">AI Education Platform</p>
           </div>
         </div>

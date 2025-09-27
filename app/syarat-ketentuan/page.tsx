@@ -274,6 +274,9 @@ export default function SyaratKetentuanPage() {
             </svg>
           </a>
         </div>
+
+        <br></br>
+        
             <p className="text-center text-sm text-gray-500">
               © 2025 Insan AI. All rights reserved.
             </p>
