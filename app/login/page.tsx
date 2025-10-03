@@ -61,22 +61,34 @@ export default function LoginPage() {
         // Save user session
         saveUserSession(result.user);
 
-        // Redirect based on role
-        setTimeout(() => {
+        // Compute destination based on role and perform a full-page navigation
+        // using window.location to ensure we land on the dashboard page (no risk of
+        // reloading the login page due to client-side nav timing).
+        const destination = (() => {
           switch (result.user?.role) {
             case 'student':
-              router.push('/dashboard/student');
-              break;
+              return '/dashboard/student';
             case 'teacher':
-              router.push('/dashboard/teacher');
-              break;
+              return '/dashboard/teacher';
             case 'admin':
-              router.push('/dashboard/admin');
-              break;
+              return '/dashboard/admin';
             default:
-              router.push('/dashboard');
+              return '/dashboard';
           }
-        }, 1000);
+        })();
+
+        // Small UX delay so the success message briefly shows, then navigate
+        setTimeout(() => {
+          try {
+            // Use full navigation to destination so the browser loads the dashboard URL
+            // directly and picks up the saved session reliably.
+            window.location.assign(destination);
+          } catch (err) {
+            // Fallback to router navigation if window.location fails for some reason
+            console.error('window.location.assign failed, falling back to router.push', err);
+            router.push(destination);
+          }
+        }, 600);
       }
     } catch (err) {
       console.error('Login error:', err);

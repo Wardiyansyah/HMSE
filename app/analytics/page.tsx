@@ -8,44 +8,153 @@ import { NavigationHeader } from '@/components/navigation-header-teacher';
 import { useLanguage } from '@/lib/language-context';
 import { BarChart3, TrendingUp, TrendingDown, Users, BookOpen, Clock, Award, AlertTriangle, CheckCircle, Target } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import { useEffect, useState } from 'react';
+import { getPerformanceTrend, getWeeklyActivityTrend, getSubjectTimeDistribution, getSubjectAttentionAreas, getIndividualStudentPerformance, getRiskPredictions, getGlobalStats } from '@/lib/database-helpers';
 
 export default function LearningAnalytics() {
   const { t } = useLanguage();
 
-  const performanceData = [
-    { month: t('common.jan'), matematika: 75, fisika: 68, kimia: 82, biologi: 79 },
-    { month: t('common.feb'), matematika: 78, fisika: 72, kimia: 85, biologi: 81 },
-    { month: t('common.mar'), matematika: 82, fisika: 75, kimia: 88, biologi: 84 },
-    { month: t('common.apr'), matematika: 85, fisika: 78, kimia: 90, biologi: 87 },
-    { month: t('common.may'), matematika: 88, fisika: 82, kimia: 92, biologi: 89 },
-    { month: t('common.jun'), matematika: 90, fisika: 85, kimia: 94, biologi: 91 },
-  ];
+  const [performanceData, setPerformanceData] = useState<Array<{ month: string; matematika?: number; fisika?: number; kimia?: number; biologi?: number }>>([]);
+  useEffect(() => {
+    async function fetchPerformance() {
+      const data = await getPerformanceTrend();
+      // Optionally, localize month names
+      setPerformanceData(
+        data.map((row) => ({
+          ...row,
+          month: localizeMonth(row.month, t),
+        }))
+      );
+    }
+    fetchPerformance();
+  }, [t]);
 
-  const subjectDistribution = [
-    { name: t('subject.matematika'), value: 30, color: '#3B82F6' },
-    { name: t('subject.fisika'), value: 25, color: '#10B981' },
-    { name: t('subject.kimia'), value: 20, color: '#F59E0B' },
-    { name: t('subject.biologi'), value: 15, color: '#EF4444' },
-    { name: t('common.others'), value: 10, color: '#8B5CF6' },
-  ];
+  function localizeMonth(month: string, t: any) {
+    // month: '2025-01' => 'Jan 2025' (or t('common.jan'))
+    const [year, m] = month.split('-');
+    const monthMap: Record<string, string> = {
+      '01': t('common.jan'),
+      '02': t('common.feb'),
+      '03': t('common.mar'),
+      '04': t('common.apr'),
+      '05': t('common.may'),
+      '06': t('common.jun'),
+      '07': t('common.jul'),
+      '08': t('common.aug'),
+      '09': t('common.sep'),
+      '10': t('common.oct'),
+      '11': t('common.nov'),
+      '12': t('common.dec'),
+    };
+    return `${monthMap[m] || m} ${year}`;
+  }
 
-  const weeklyActivity = [
-    { day: t('common.mon'), hours: 2.5 },
-    { day: t('common.tue'), hours: 3.2 },
-    { day: t('common.wed'), hours: 1.8 },
-    { day: t('common.thu'), hours: 4.1 },
-    { day: t('common.fri'), hours: 2.9 },
-    { day: t('common.sat'), hours: 5.2 },
-    { day: t('common.sun'), hours: 3.7 },
-  ];
+  const [subjectDistribution, setSubjectDistribution] = useState<Array<{ name: string; value: number; color?: string; percent?: number }>>([]);
+  useEffect(() => {
+    async function fetchSubjectDistribution() {
+      const data = await getSubjectTimeDistribution();
+      setSubjectDistribution(
+        data.map((row) => ({
+          ...row,
+          name: t('subject.' + (row.name?.toLowerCase() || row.name)) || row.name,
+        }))
+      );
+    }
+    fetchSubjectDistribution();
+  }, [t]);
+  const [subjectAttentionAreas, setSubjectAttentionAreas] = useState<Array<{ name: string; percent_difficult: number; recommendation: string }>>([]);
+  useEffect(() => {
+    async function fetchSubjectAttentionAreas() {
+      const data = await getSubjectAttentionAreas();
+      setSubjectAttentionAreas(
+        data.map((row) => ({
+          ...row,
+          name: t('subject.' + (row.name?.toLowerCase() || row.name)) || row.name,
+          recommendation: row.recommendation,
+        }))
+      );
+    }
+    fetchSubjectAttentionAreas();
+  }, [t]);
 
-  const studentProgress = [
-    { name: 'Ahmad Rizki', matematika: 92, fisika: 88, kimia: 95, status: 'excellent' },
-    { name: 'Siti Nurhaliza', matematika: 85, fisika: 82, kimia: 89, status: 'good' },
-    { name: 'Budi Santoso', matematika: 78, fisika: 75, kimia: 80, status: 'average' },
-    { name: 'Dewi Lestari', matematika: 65, fisika: 62, kimia: 68, status: 'needs_attention' },
-    { name: 'Eko Prasetyo', matematika: 58, fisika: 55, kimia: 60, status: 'needs_attention' },
-  ];
+  const [weeklyActivity, setWeeklyActivity] = useState<Array<{ day: string; hours: number }>>([]);
+  useEffect(() => {
+    async function fetchWeeklyActivity() {
+      const data = await getWeeklyActivityTrend();
+      setWeeklyActivity(
+        data.map((row) => ({
+          ...row,
+          day: localizeDay(row.day, t),
+        }))
+      );
+    }
+    fetchWeeklyActivity();
+  }, [t]);
+
+  function localizeDay(day: string, t: any) {
+    // English day to localized
+    const dayMap: Record<string, string> = {
+      'Monday': t('common.mon'),
+      'Tuesday': t('common.tue'),
+      'Wednesday': t('common.wed'),
+      'Thursday': t('common.thu'),
+      'Friday': t('common.fri'),
+      'Saturday': t('common.sat'),
+      'Sunday': t('common.sun'),
+    };
+    return dayMap[day] || day;
+  }
+
+  const [studentProgress, setStudentProgress] = useState<any[]>([]);
+  const [riskPredictions, setRiskPredictions] = useState<Array<{ full_name: string; current_grade: number | null; attendance_rate: number | null; status_prediksi: string }>>([]);
+  const [globalStats, setGlobalStats] = useState<{ total_siswa: number; rata_rata_nilai: number | null; total_jam_belajar: number; materi_selesai_persen: number }>({ total_siswa: 0, rata_rata_nilai: null, total_jam_belajar: 0, materi_selesai_persen: 0 });
+
+  useEffect(() => {
+    async function fetchStudentPerformance() {
+      const rows = await getIndividualStudentPerformance();
+      // rows: [{ full_name, subject, average_score }]
+      // Transform into per-student object
+      const grouped: Record<string, any> = {};
+      for (const r of rows) {
+        const name = r.full_name || 'Unknown';
+        if (!grouped[name]) grouped[name] = { name };
+        const subjKey = r.subject.toLowerCase().includes('matematika')
+          ? 'matematika'
+          : r.subject.toLowerCase().includes('fisika')
+          ? 'fisika'
+          : r.subject.toLowerCase().includes('kimia')
+          ? 'kimia'
+          : r.subject.toLowerCase().includes('biologi')
+          ? 'biologi'
+          : r.subject.toLowerCase();
+        grouped[name][subjKey] = Number(r.average_score);
+      }
+
+      const list = Object.keys(grouped).map((name) => {
+        const s = grouped[name];
+        const scores = [s.matematika, s.fisika, s.kimia, s.biologi].filter((v) => typeof v === 'number');
+        const avg = scores.length ? Math.round((scores.reduce((a: number, b: number) => a + b, 0) / scores.length) * 100) / 100 : 0;
+        let status = 'average';
+        if (avg >= 90) status = 'excellent';
+        else if (avg >= 80) status = 'good';
+        else if (avg < 70) status = 'needs_attention';
+        return { ...s, status };
+      });
+
+      setStudentProgress(list);
+    }
+    fetchStudentPerformance();
+    async function fetchRiskPreds() {
+      const preds = await getRiskPredictions();
+      setRiskPredictions(preds);
+    }
+    fetchRiskPreds();
+    async function fetchGlobalStats() {
+      const stats = await getGlobalStats();
+      setGlobalStats(stats);
+    }
+    fetchGlobalStats();
+  }, [t]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -97,7 +206,7 @@ export default function LearningAnalytics() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400">{t('analytics.total-students')}</p>
-                  <p className="text-xl md:text-2xl font-bold text-blue-600">156</p>
+                  <p className="text-xl md:text-2xl font-bold text-blue-600">{globalStats.total_siswa}</p>
                   <p className="text-xs text-green-600 flex items-center mt-1">
                     <TrendingUp className="h-3 w-3 mr-1" />
                     +12% {t('common.from-last-month')}
@@ -113,7 +222,7 @@ export default function LearningAnalytics() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400">{t('analytics.avg-score')}</p>
-                  <p className="text-xl md:text-2xl font-bold text-green-600">84.2</p>
+                  <p className="text-xl md:text-2xl font-bold text-green-600">{globalStats.rata_rata_nilai != null ? globalStats.rata_rata_nilai.toFixed(1) : '-'}</p>
                   <p className="text-xs text-green-600 flex items-center mt-1">
                     <TrendingUp className="h-3 w-3 mr-1" />
                     +3.5 {t('common.points')}
@@ -129,7 +238,7 @@ export default function LearningAnalytics() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400">{t('analytics.learning-hours')}</p>
-                  <p className="text-xl md:text-2xl font-bold text-purple-600">1,247</p>
+                  <p className="text-xl md:text-2xl font-bold text-purple-600">{Math.round(globalStats.total_jam_belajar)}</p>
                   <p className="text-xs text-red-600 flex items-center mt-1">
                     <TrendingDown className="h-3 w-3 mr-1" />
                     -5% {t('common.this-week')}
@@ -145,7 +254,7 @@ export default function LearningAnalytics() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs md:text-sm font-medium text-gray-600 dark:text-gray-400">{t('analytics.completed-materials')}</p>
-                  <p className="text-xl md:text-2xl font-bold text-orange-600">89%</p>
+                  <p className="text-xl md:text-2xl font-bold text-orange-600">{Math.round(globalStats.materi_selesai_persen)}%</p>
                   <p className="text-xs text-green-600 flex items-center mt-1">
                     <TrendingUp className="h-3 w-3 mr-1" />
                     +7% {t('common.target-achieved')}
@@ -234,7 +343,7 @@ export default function LearningAnalytics() {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
-                      <Pie data={subjectDistribution} cx="50%" cy="50%" outerRadius={80} fill="#8884d8" dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                      <Pie data={subjectDistribution} cx="50%" cy="50%" outerRadius={80} fill="#8884d8" dataKey="value" label={({ name, percent }: any) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}>
                         {subjectDistribution.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
@@ -259,41 +368,44 @@ export default function LearningAnalytics() {
                   <CardDescription className="text-sm">{t('analytics.areas-of-attention-description')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-700">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <AlertTriangle className="h-5 w-5 text-red-600" />
-                      <h4 className="font-semibold text-red-800 dark:text-red-300">
-                        {t('subject.aljabar')} - {t('common.needs-more-practice')}
-                      </h4>
-                    </div>
-                    <p className="text-sm text-red-700 dark:text-red-400">
-                      23% {t('common.students-struggle-linear-equations')}. {t('common.recommend-tutorial-videos')}.
-                    </p>
-                  </div>
-
-                  <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-700">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <Target className="h-5 w-5 text-yellow-600" />
-                      <h4 className="font-semibold text-yellow-800 dark:text-yellow-300">
-                        {t('subject.fisika')} - {t('common.momentum')}
-                      </h4>
-                    </div>
-                    <p className="text-sm text-yellow-700 dark:text-yellow-400">
-                      {t('common.momentum-concept-needs-visuals')}. {t('common.use-interactive-simulations')}.
-                    </p>
-                  </div>
-
-                  <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-700">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                      <h4 className="font-semibold text-green-800 dark:text-green-300">
-                        {t('subject.kimia')} - {t('common.excellent')}
-                      </h4>
-                    </div>
-                    <p className="text-sm text-green-700 dark:text-green-400">
-                      {t('common.organic-chemistry-performance-increased')}. {t('common.maintain-current-method')}.
-                    </p>
-                  </div>
+                  {subjectAttentionAreas.length === 0 ? (
+                    <div className="text-gray-500 dark:text-gray-400">{t('common.no-data')}</div>
+                  ) : (
+                    subjectAttentionAreas.map((area, idx) => (
+                      <div
+                        key={idx}
+                        className={
+                          area.percent_difficult > 20
+                            ? 'bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-700'
+                            : 'bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-700'
+                        }
+                      >
+                        <div className="flex items-center space-x-2 mb-2">
+                          {area.percent_difficult > 20 ? (
+                            <AlertTriangle className="h-5 w-5 text-red-600" />
+                          ) : (
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                          )}
+                          <h4 className={
+                            area.percent_difficult > 20
+                              ? 'font-semibold text-red-800 dark:text-red-300'
+                              : 'font-semibold text-green-800 dark:text-green-300'
+                          }>
+                            {area.name} - {area.recommendation}
+                          </h4>
+                        </div>
+                        <p className={
+                          area.percent_difficult > 20
+                            ? 'text-sm text-red-700 dark:text-red-400'
+                            : 'text-sm text-green-700 dark:text-green-400'
+                        }>
+                          {area.percent_difficult}% {area.percent_difficult > 20
+                            ? t('common.students-struggle')
+                            : t('common.students-good')}
+                        </p>
+                      </div>
+                    ))
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -313,27 +425,27 @@ export default function LearningAnalytics() {
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
                             <span className="font-semibold text-gray-600 dark:text-gray-300">
-                              {student.name
+                              {String(student.name)
                                 .split(' ')
-                                .map((n) => n[0])
+                                .map((n: string) => n[0])
                                 .join('')}
                             </span>
                           </div>
                           <div>
                             <h4 className="font-semibold">{student.name}</h4>
                             <div className="flex items-center space-x-2">
-                              {getStatusIcon(student.status)}
-                              <Badge className={getStatusColor(student.status)}>
-                                {student.status === 'excellent' && t('common.excellent')}
-                                {student.status === 'good' && t('common.good')}
-                                {student.status === 'average' && t('common.average')}
-                                {student.status === 'needs_attention' && t('common.needs-attention')}
-                              </Badge>
-                            </div>
+                                  {getStatusIcon(String(student.status || 'average'))}
+                                  <Badge className={getStatusColor(String(student.status || 'average'))}>
+                                    {student.status === 'excellent' && t('common.excellent')}
+                                    {student.status === 'good' && t('common.good')}
+                                    {student.status === 'average' && t('common.average')}
+                                    {student.status === 'needs_attention' && t('common.needs-attention')}
+                                  </Badge>
+                                </div>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-lg font-bold">{Math.round((student.matematika + student.fisika + student.kimia) / 3)}</div>
+                          <div className="text-lg font-bold">{Math.round(((Number(student.matematika)||0) + (Number(student.fisika)||0) + (Number(student.kimia)||0)) / 3)}</div>
                           <div className="text-sm text-gray-500 dark:text-gray-400">{t('common.average')}</div>
                         </div>
                       </div>
@@ -389,8 +501,15 @@ export default function LearningAnalytics() {
                   <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
                     <h4 className="font-semibold text-orange-800 dark:text-orange-300 mb-2">⚠️ {t('common.risk-prediction')}</h4>
                     <p className="text-sm text-orange-700 dark:text-orange-400">
-                      5 {t('common.students-at-risk')}. {t('common.recommend-tutoring-sessions')}.
+                      {riskPredictions.filter(r => r.status_prediksi === 'Berisiko').length} {t('common.students-at-risk')}.
                     </p>
+                    {riskPredictions.filter(r => r.status_prediksi === 'Berisiko').slice(0,5).length > 0 && (
+                      <ul className="mt-2 text-sm text-orange-700 dark:text-orange-400 list-disc pl-5">
+                        {riskPredictions.filter(r => r.status_prediksi === 'Berisiko').slice(0,5).map((r, idx) => (
+                          <li key={idx}>{r.full_name} {r.current_grade != null ? `(${r.current_grade})` : ''}</li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
 
                   <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">

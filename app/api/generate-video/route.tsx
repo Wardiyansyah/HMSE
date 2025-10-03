@@ -77,7 +77,7 @@ Aturan:
       location: process.env.LOCATION!,
     });
 
-    const model = vertex.preview.getGenerativeModel({ model: "veo-3" });
+    const model = vertex.preview.getGenerativeModel({ model: "veo-3.0-generate-001" });
 
     const veoRes = await model.generateContent({
       contents: [{ role: "user", parts: [{ text: veoPrompt }] }],

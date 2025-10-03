@@ -12,6 +12,7 @@ import { useAppStore } from '@/lib/store';
 import { Brain, Home, Sparkles, MessageCircle, BarChart3, BookOpen, Users, Settings, Menu, ChevronDown, User, LogOut } from 'lucide-react';
 import { getCurrentUser, getUserProfile } from '@/lib/auth-helpers';
 import { supabase } from '@/lib/supabase';
+import { logoutAndRedirect } from '@/lib/logout';
 
 const menuItems = [
   {
@@ -22,19 +23,19 @@ const menuItems = [
   },
   {
     title: 'Virtual Tutor',
-    url: '/virtual-tutor',
+    url: '/virtual-tutor/student',
     icon: MessageCircle,
     description: 'Chat dengan AI tutor 24/7',
   },
   {
     title: 'Materi Pembelajaran',
-    url: '/library',
+    url: '/library/student',
     icon: BookOpen,
     description: 'Koleksi materi pembelajaran',
   },
   {
     title: 'Grup Belajar',
-    url: '/community',
+    url: '/community/student',
     icon: Users,
     description: 'Diskusi dan berbagi pengalaman',
   },
@@ -92,7 +93,7 @@ export function NavigationHeader() {
                   ))}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/settings" className="flex items-center space-x-3 p-3 cursor-pointer">
+                    <Link href="/settings/student" className="flex items-center space-x-3 p-3 cursor-pointer">
                       <div className="p-1.5 bg-gray-100 rounded-md">
                         <Settings className="h-4 w-4 text-gray-600" />
                       </div>
@@ -144,22 +145,22 @@ export function NavigationHeader() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/settings" className="flex items-center space-x-2 cursor-pointer">
+                  <Link href="/settings/student" className="flex items-center space-x-2 cursor-pointer">
                     <User className="h-4 w-4" />
                     <span>Profil</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/settings" className="flex items-center space-x-2 cursor-pointer">
+                  <Link href="/settings/student" className="flex items-center space-x-2 cursor-pointer">
                     <Settings className="h-4 w-4" />
                     <span>Pengaturan</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/" className="flex items-center space-x-2 cursor-pointer">
+                <DropdownMenuItem>
+                  <button onClick={() => logoutAndRedirect('/')} className="w-full text-left flex items-center space-x-2">
                     <LogOut className="h-4 w-4" />
                     <span>Keluar</span>
-                  </Link>
+                  </button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -228,7 +229,7 @@ export function NavigationHeader() {
 
                     {/* Settings */}
                     <div className="border-t pt-4">
-                      <Link href="/settings" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-colors">
+                      <Link href="/settings/student" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-colors">
                         <div className="p-1.5 bg-white rounded-md shadow-sm">
                           <Settings className="h-4 w-4" />
                         </div>

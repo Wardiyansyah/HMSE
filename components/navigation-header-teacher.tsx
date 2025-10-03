@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { useAppStore } from '@/lib/store';
 import { Brain, Home, Sparkles, MessageCircle, BarChart3, BookOpen, Users, Settings, Menu, ChevronDown, User, LogOut } from 'lucide-react';
 import { getCurrentUser, getUserProfile } from '@/lib/auth-helpers';
+import { logoutAndRedirect } from '@/lib/logout';
 import { supabase } from '@/lib/supabase';
 
 const menuItems = [
@@ -28,7 +29,7 @@ const menuItems = [
   },
   {
     title: 'Virtual Tutor',
-    url: '/virtual-tutor',
+    url: '/virtual-tutor/teacher',
     icon: MessageCircle,
     description: 'Chat dengan AI tutor 24/7',
   },
@@ -40,13 +41,13 @@ const menuItems = [
   },
   {
     title: 'Materi Pembelajaran',
-    url: '/library',
+    url: '/library/teacher',
     icon: BookOpen,
     description: 'Koleksi materi pembelajaran',
   },
   {
     title: 'Grup Belajar',
-    url: '/community',
+    url: '/community/teacher',
     icon: Users,
     description: 'Diskusi dan berbagi pengalaman',
   },
@@ -68,7 +69,7 @@ export function NavigationHeader() {
             {/* Logo */}
             <Link href="/dashboard" className="flex items-center space-x-2">
               <div className="p-2 rounded-lg">
-                <img src=".\logo\insanAI.png" alt="insanAI-Logo" className="h-14 w-14" />
+                <img src="..\logo\insanAI.png" alt="insanAI-Logo" className="h-14 w-14" />
               </div>
               <div className="hidden sm:block">
                 <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">EduGenAI</h2>
@@ -104,7 +105,7 @@ export function NavigationHeader() {
                   ))}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/settings" className="flex items-center space-x-3 p-3 cursor-pointer">
+                    <Link href="/settings/teacher" className="flex items-center space-x-3 p-3 cursor-pointer">
                       <div className="p-1.5 bg-gray-100 rounded-md">
                         <Settings className="h-4 w-4 text-gray-600" />
                       </div>
@@ -123,6 +124,7 @@ export function NavigationHeader() {
           <div className="flex items-center space-x-3">
             {/* User Info - Hidden on small screens */}
             <div className="hidden lg:block text-right">
+            <p className="text-sm font-medium">{user?.name}</p>
               <Badge variant="secondary" className="text-x2xl">
                 Teacher Dashboard
               </Badge>
@@ -144,11 +146,11 @@ export function NavigationHeader() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem asChild>
-                  <Link href="/" className="flex items-center space-x-2 cursor-pointer">
+                <DropdownMenuItem>
+                  <button onClick={() => logoutAndRedirect('/')} className="w-full text-left flex items-center space-x-2">
                     <LogOut className="h-4 w-4" />
                     <span>Keluar</span>
-                  </Link>
+                  </button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -217,7 +219,7 @@ export function NavigationHeader() {
 
                     {/* Settings */}
                     <div className="border-t pt-4">
-                      <Link href="/settings" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-colors">
+                      <Link href="/settings/teacher" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-100 transition-colors">
                         <div className="p-1.5 bg-white rounded-md shadow-sm">
                           <Settings className="h-4 w-4" />
                         </div>

@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useAppStore } from '@/lib/store';
 import { Brain, Home, Sparkles, MessageCircle, BarChart3, BookOpen, Users, Settings, Menu, ChevronDown, User } from 'lucide-react';
+import { logoutAndRedirect } from '@/lib/logout';
 
 export function NavigationHeaderGuest() {
   const { user } = useAppStore();
@@ -74,11 +75,11 @@ export function NavigationHeaderGuest() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator /> */}
 
-                <DropdownMenuItem asChild>
-                  <Link href="/login" className="flex items-center space-x-2 cursor-pointer">
+                <DropdownMenuItem>
+                  <button onClick={() => logoutAndRedirect('/login')} className="w-full text-left flex items-center space-x-2">
                     <User className="h-4 w-4" />
                     <span>Masuk</span>
-                  </Link>
+                  </button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
