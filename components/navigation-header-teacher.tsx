@@ -145,7 +145,20 @@ export function NavigationHeader() {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
+
               <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem asChild>
+                  <Link href="/settings/teacher" className="flex items-center space-x-2 cursor-pointer">
+                    <User className="h-4 w-4" />
+                    <span>Profil</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/settings/teacher" className="flex items-center space-x-2 cursor-pointer">
+                    <Settings className="h-4 w-4" />
+                    <span>Pengaturan</span>
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem>
                   <button onClick={() => logoutAndRedirect('/')} className="w-full text-left flex items-center space-x-2">
                     <LogOut className="h-4 w-4" />
