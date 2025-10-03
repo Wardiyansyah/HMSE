@@ -72,7 +72,7 @@ export function NavigationHeader() {
                 <img src="..\logo\insanAI.png" alt="insanAI-Logo" className="h-14 w-14" />
               </div>
               <div className="hidden sm:block">
-                <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">EduGenAI</h2>
+                <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">InsanAI</h2>
                 <p className="text-xs text-gray-600">AI Education Platform</p>
               </div>
             </Link>
@@ -124,7 +124,7 @@ export function NavigationHeader() {
           <div className="flex items-center space-x-3">
             {/* User Info - Hidden on small screens */}
             <div className="hidden lg:block text-right">
-            <p className="text-sm font-medium">{user?.name}</p>
+              <p className="text-sm font-medium">{user?.name}</p>
               <Badge variant="secondary" className="text-x2xl">
                 Teacher Dashboard
               </Badge>

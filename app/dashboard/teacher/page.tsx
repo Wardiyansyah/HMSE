@@ -46,7 +46,7 @@ export default function EduGenAIDashboard() {
         duration: '4 minggu',
         level: t('common.advanced'),
         icon: <BookOpen className="h-4 w-4" />,
-        url: '/virtual-tutor',
+        url: '/virtual-tutor/teacher',
       },
       {
         title: 'Fisika Dasar: Hukum Newton Interaktif',
@@ -54,7 +54,7 @@ export default function EduGenAIDashboard() {
         duration: '45 menit',
         level: t('common.beginner'),
         icon: <Play className="h-4 w-4" />,
-        url: '/virtual-tutor',
+        url: '/virtual-tutor/teacher',
       },
     ],
     professional: [
@@ -98,7 +98,7 @@ export default function EduGenAIDashboard() {
     },
   };
 
-  const currentUserRole = user?.role || 'student';
+  const currentUserRole = user?.role || 'teacher';
   const currentRecommendations = recommendations[currentUserRole] || recommendations.student;
   const currentStats = learningStats[currentUserRole] || learningStats.student;
 
@@ -144,7 +144,9 @@ export default function EduGenAIDashboard() {
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{t('dashboard.welcome')}, {user?.name} 👋</h2>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                {t('dashboard.welcome')}, {user?.name} 👋
+              </h2>
               <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
                 {currentUserRole === 'student' && t('dashboard.student.subtitle')}
                 {currentUserRole === 'teacher' && t('dashboard.teacher.subtitle')}
@@ -240,8 +242,13 @@ export default function EduGenAIDashboard() {
                       <p className="text-xs text-green-600 flex items-center mt-1">
                         <Users className="h-3 w-3 mr-1" />
                         {teacherStats && teacherStats.students_by_month_last2.length === 2 ? (
-                          <span>{teacherStats.students_by_month_last2[0].count} ({teacherStats.students_by_month_last2[1].count >= teacherStats.students_by_month_last2[0].count ? '+' : ''}{teacherStats.students_by_month_last2[1].count - teacherStats.students_by_month_last2[0].count}) {t('common.from-last-month')}</span>
-                        ) : t('common.loading')}
+                          <span>
+                            {teacherStats.students_by_month_last2[0].count} ({teacherStats.students_by_month_last2[1].count >= teacherStats.students_by_month_last2[0].count ? '+' : ''}
+                            {teacherStats.students_by_month_last2[1].count - teacherStats.students_by_month_last2[0].count}) {t('common.from-last-month')}
+                          </span>
+                        ) : (
+                          t('common.loading')
+                        )}
                       </p>
                     </div>
                     <div className="p-2 md:p-3 bg-blue-100 dark:bg-blue-900/20 rounded-full">
@@ -260,8 +267,12 @@ export default function EduGenAIDashboard() {
                       <p className="text-xs text-green-600 flex items-center mt-1">
                         <Award className="h-3 w-3 mr-1" />
                         {teacherStats && teacherStats.grades_by_month_last2.length === 2 ? (
-                          <span>{teacherStats.grades_by_month_last2[0].rata_rata_nilai} vs {teacherStats.grades_by_month_last2[1].rata_rata_nilai}</span>
-                        ) : t('common.loading')}
+                          <span>
+                            {teacherStats.grades_by_month_last2[0].rata_rata_nilai} vs {teacherStats.grades_by_month_last2[1].rata_rata_nilai}
+                          </span>
+                        ) : (
+                          t('common.loading')
+                        )}
                       </p>
                     </div>
                     <div className="p-2 md:p-3 bg-green-100 dark:bg-green-900/20 rounded-full">
@@ -280,8 +291,12 @@ export default function EduGenAIDashboard() {
                       <p className="text-xs text-purple-600 flex items-center mt-1">
                         <Clock className="h-3 w-3 mr-1" />
                         {teacherStats && teacherStats.jam_belajar_by_week_last2.length === 2 ? (
-                          <span>{teacherStats.jam_belajar_by_week_last2[0].jam_belajar} vs {teacherStats.jam_belajar_by_week_last2[1].jam_belajar} minggu lalu</span>
-                        ) : t('common.loading')}
+                          <span>
+                            {teacherStats.jam_belajar_by_week_last2[0].jam_belajar} vs {teacherStats.jam_belajar_by_week_last2[1].jam_belajar} minggu lalu
+                          </span>
+                        ) : (
+                          t('common.loading')
+                        )}
                       </p>
                     </div>
                     <div className="p-2 md:p-3 bg-purple-100 dark:bg-purple-900/20 rounded-full">
@@ -300,8 +315,12 @@ export default function EduGenAIDashboard() {
                       <p className="text-xs text-orange-600 flex items-center mt-1">
                         <BookOpen className="h-3 w-3 mr-1" />
                         {teacherStats && teacherStats.materi_selesai_by_month_last2.length === 2 ? (
-                          <span>{teacherStats.materi_selesai_by_month_last2[0].materi_selesai_persen}% vs {teacherStats.materi_selesai_by_month_last2[1].materi_selesai_persen}%</span>
-                        ) : t('common.loading')}
+                          <span>
+                            {teacherStats.materi_selesai_by_month_last2[0].materi_selesai_persen}% vs {teacherStats.materi_selesai_by_month_last2[1].materi_selesai_persen}%
+                          </span>
+                        ) : (
+                          t('common.loading')
+                        )}
                       </p>
                     </div>
                     <div className="p-2 md:p-3 bg-orange-100 dark:bg-orange-900/20 rounded-full">
@@ -402,7 +421,7 @@ export default function EduGenAIDashboard() {
                       <div className="bg-white dark:bg-card p-3 rounded border dark:border-gray-700 text-sm">
                         <strong>Contoh:</strong> Rekam jawaban sejarah → AI beri nilai + feedback tertulis
                       </div>
-                      <Link href="/virtual-tutor">
+                      <Link href="/virtual-tutor/teacher">
                         <Button className="mt-3" size="sm">
                           <FileText className="h-4 w-4 mr-2" />
                           Mulai Assessment
@@ -438,7 +457,7 @@ export default function EduGenAIDashboard() {
                       <strong>AI Tutor:</strong> "Baik, berikut 5 soal latihan dengan tingkat kesulitan bertahap…"
                     </p>
                   </div>
-                  <Link href="/virtual-tutor">
+                  <Link href="/virtual-tutor/teacher">
                     <Button className="w-full">
                       <MessageCircle className="h-4 w-4 mr-2" />
                       Chat dengan AI Tutor
@@ -455,27 +474,25 @@ export default function EduGenAIDashboard() {
                 <CardDescription className="text-sm">{t('dashboard.progress.subtitle')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {avgProgressBySubject && avgProgressBySubject.length > 0 ? (
-                  avgProgressBySubject.map((s, index) => (
-                    <div key={index}>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span>{t(`subject.${(s.mata_pelajaran || '').toLowerCase()}`) || s.mata_pelajaran}</span>
-                        <span>{s.rata_rata_progress}%</span>
+                {avgProgressBySubject && avgProgressBySubject.length > 0
+                  ? avgProgressBySubject.map((s, index) => (
+                      <div key={index}>
+                        <div className="flex justify-between text-sm mb-2">
+                          <span>{t(`subject.${(s.mata_pelajaran || '').toLowerCase()}`) || s.mata_pelajaran}</span>
+                          <span>{s.rata_rata_progress}%</span>
+                        </div>
+                        <Progress value={s.rata_rata_progress} className="h-2" />
                       </div>
-                      <Progress value={s.rata_rata_progress} className="h-2" />
-                    </div>
-                  ))
-                ) : (
-                  learningProgress.map((subject, index) => (
-                    <div key={index}>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span>{t(`subject.${subject.subject.toLowerCase()}`)}</span>
-                        <span>{subject.progress}%</span>
+                    ))
+                  : learningProgress.map((subject, index) => (
+                      <div key={index}>
+                        <div className="flex justify-between text-sm mb-2">
+                          <span>{t(`subject.${subject.subject.toLowerCase()}`)}</span>
+                          <span>{subject.progress}%</span>
+                        </div>
+                        <Progress value={subject.progress} className="h-2" />
                       </div>
-                      <Progress value={subject.progress} className="h-2" />
-                    </div>
-                  ))
-                )}
+                    ))}
               </CardContent>
             </Card>
 
@@ -485,7 +502,7 @@ export default function EduGenAIDashboard() {
                 <CardTitle className="text-lg">{t('dashboard.quick-actions')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Link href="/virtual-tutor">
+                <Link href="/virtual-tutor/teacher">
                   <Button variant="outline" className="w-full justify-start bg-transparent">
                     <MessageCircle className="h-4 w-4 mr-2" />
                     {t('dashboard.virtual-tutor')}
