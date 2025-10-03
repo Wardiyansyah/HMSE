@@ -14,6 +14,27 @@ export const metadata: Metadata = {
   title: 'InsanAI - Intelligent Assistant for Insan Pembangunan',
   description: 'Platform pembelajaran AI yang menghadirkan pengalaman belajar personal dan adaptif untuk semua kalangan',
   generator: 'InsanPembangunanDev',
+
+  icons: {
+    icon: [
+      {
+        url: '/logo/insanAI-03.png', // Favicon standar
+        sizes: '32x32',
+        type: 'image/png',
+      },
+      {
+        url: '/logo/insanAI-03.png', // Ukuran umum lainnya
+        sizes: '32x32',
+        type: 'image/png',
+      },
+      {
+        // Ikon resolusi tinggi, sering digunakan oleh browser modern
+        url: '/logo/insanAI-03.png',
+        sizes: '192x192',
+        type: 'image/png',
+      },
+    ],
+  },
 };
 
 const menuItems = [

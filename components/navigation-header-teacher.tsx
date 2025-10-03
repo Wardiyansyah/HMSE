@@ -67,7 +67,7 @@ export function NavigationHeader() {
           {/* Left Side - Logo + Navigation Dropdown */}
           <div className="flex items-center space-x-4">
             {/* Logo */}
-            <Link href="/dashboard" className="flex items-center space-x-2">
+            <Link href="/dashboard/teacher" className="flex items-center space-x-2">
               <div className="p-2 rounded-lg">
                 <img src="..\logo\insanAI.png" alt="insanAI-Logo" className="h-14 w-14" />
               </div>

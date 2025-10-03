@@ -28,7 +28,7 @@ const menuItems = [
   },
   {
     title: 'Virtual Tutor',
-    url: '/virtual-tutor',
+    url: '/virtual-tutor/teacher',
     icon: MessageCircle,
     description: 'Chat dengan AI tutor 24/7',
   },
