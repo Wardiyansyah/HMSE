@@ -10,10 +10,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useAppStore } from '@/lib/store';
 import { NavigationHeader } from '@/components/navigation-header-teacher';
-import { Label } from '@/components/ui/label'; 
+import { Label } from '@/components/ui/label';
 import { RefreshCw, Send } from 'lucide-react';
 import { Sparkles, Brain, ChevronDown, ChevronUp, Lightbulb, BookOpen, Calculator, Beaker, Globe, History, User, ImageIcon, FileText } from 'lucide-react';
-
 
 interface Message {
   id: string;
@@ -23,7 +22,6 @@ interface Message {
   image?: string; // tambahkan field opsional untuk gambar
   isStreaming?: boolean;
 }
-
 
 export default function VirtualTutor() {
   const { user, startSession, endSession } = useAppStore();
@@ -64,7 +62,7 @@ export default function VirtualTutor() {
       icon: <Calculator className="h-4 w-4" />,
       text: 'Analisis kesalahan umum siswa dalam integral',
       subject: 'Matematika',
-    }
+    },
   ];
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,10 +73,9 @@ export default function VirtualTutor() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-const handleOpenFileDialog = () => {
-  fileInputRef.current?.click();
-};
-
+  const handleOpenFileDialog = () => {
+    fileInputRef.current?.click();
+  };
 
   useEffect(() => {
     startSession('Virtual Tutor', 'AI Chat');
@@ -95,69 +92,55 @@ const handleOpenFileDialog = () => {
   }, [messages]);
 
   const handleSendMessage = async (content: string) => {
-  if (!content.trim() && !selectedImage) return;
+    if (!content.trim() && !selectedImage) return;
 
-  const userMessage: Message = {
-  id: Date.now().toString(),
-  type: "user",
-  content: content || "", // teks tetap disimpan
-  image: selectedImage ? URL.createObjectURL(selectedImage) : undefined,
-  timestamp: new Date().toISOString(),
-};
-
-
-  setMessages((prev) => [...prev, userMessage]);
-  setInputMessage('');
-  setIsTyping(true);
-
-  const aiMessageId = (Date.now() + 1).toString();
-  setMessages((prev) => [
-    ...prev,
-    {
-      id: aiMessageId,
-      type: 'ai',
-      content: 'Mengetik...',
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: content || '', // teks tetap disimpan
+      image: selectedImage ? URL.createObjectURL(selectedImage) : undefined,
       timestamp: new Date().toISOString(),
-      isStreaming: true,
-    },
-  ]);
+    };
 
-  try {
-    const formData = new FormData();
+    setMessages((prev) => [...prev, userMessage]);
+    setInputMessage('');
+    setIsTyping(true);
+
+    const aiMessageId = (Date.now() + 1).toString();
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: aiMessageId,
+        type: 'ai',
+        content: 'Mengetik...',
+        timestamp: new Date().toISOString(),
+        isStreaming: true,
+      },
+    ]);
+
+    try {
+      const formData = new FormData();
       formData.append('message', content);
       if (selectedImage) {
         formData.append('image', selectedImage);
       }
 
-    const res = await fetch('/api/chat-tutor', {
-      method: 'POST',
-      body: formData
-    });
+      const res = await fetch('/api/chat-tutor', {
+        method: 'POST',
+        body: formData,
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    setMessages((prev) =>
-      prev.map((msg) =>
-        msg.id === aiMessageId
-          ? { ...msg, content: data.reply || "", image: data.imageUrl || undefined, isStreaming: false }
-          : msg
-      )
-    );
-  } catch (error) {
-    console.error('Error:', error);
-    setMessages((prev) =>
-      prev.map((msg) =>
-        msg.id === aiMessageId
-          ? { ...msg, content: '⚠️ Terjadi kesalahan. Coba lagi nanti.', isStreaming: false }
-          : msg
-      )
-    );
-  }
+      setMessages((prev) => prev.map((msg) => (msg.id === aiMessageId ? { ...msg, content: data.reply || '', image: data.imageUrl || undefined, isStreaming: false } : msg)));
+    } catch (error) {
+      console.error('Error:', error);
+      setMessages((prev) => prev.map((msg) => (msg.id === aiMessageId ? { ...msg, content: '⚠️ Terjadi kesalahan. Coba lagi nanti.', isStreaming: false } : msg)));
+    }
 
-  setSelectedImage(null)
-  setIsTyping(false);
-};
-
+    setSelectedImage(null);
+    setIsTyping(false);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-950 dark:to-black">
@@ -167,7 +150,7 @@ const handleOpenFileDialog = () => {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2 flex items-center">
-            <Brain className="h-6 w-6 md:h-8 md:w-8 mr-2 md:mr-3 text-blue-600" />
+            <img src="\logo\insanAI-blue.png" alt="logo-insanAi02" className="h-10 w-10 md:h-14 md:w-14 mr-2 md:mr-3 text-blue-600" />
             Virtual AI Tutor
           </h1>
           <p className="text-sm md:text-base text-gray-600 dark:text-gray-400">Asisten pembelajaran AI yang siap membantu Anda 24/7 dengan penjelasan yang mudah dipahami</p>
@@ -195,7 +178,7 @@ const handleOpenFileDialog = () => {
                 <div className="flex items-center space-x-3">
                   <Avatar className="border-2 border-blue-200 dark:border-blue-700">
                     <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-                      <Brain className="h-5 w-5" />
+                      <img src="\logo\insanAI-white.png" alt="logo-insanAi02" />
                     </AvatarFallback>
                   </Avatar>
                   <div>
@@ -219,41 +202,22 @@ const handleOpenFileDialog = () => {
                         <div className={`flex space-x-2 max-w-[85%] ${message.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
                           <Avatar className="w-8 h-8 flex-shrink-0">
                             <AvatarFallback className={message.type === 'user' ? 'bg-gray-100 dark:bg-gray-700' : 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'}>
-                              {message.type === 'user' ? <User className="h-4 w-4" /> : <Brain className="h-4 w-4" />}
+                              {message.type === 'user' ? <User className="h-4 w-4" /> : <img src="\logo\insanAI-white.png" />}
                             </AvatarFallback>
                           </Avatar>
-                          <div
-                            className={`rounded-lg p-3 md:p-4 break-words ${
-                              message.type === 'user'
-                                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white'
-                                : 'bg-white dark:bg-card border shadow-sm dark:border-gray-700'
-                            }`}
-                          >
+                          <div className={`rounded-lg p-3 md:p-4 break-words ${message.type === 'user' ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white' : 'bg-white dark:bg-card border shadow-sm dark:border-gray-700'}`}>
                             {/* gambar dari user */}
                             {message.type === 'user' && message.image && (
                               <div className="mb-2">
-                                <img
-                                  src={message.image}
-                                  alt="Gambar yang dikirim"
-                                  className="rounded-lg max-w-[200px] border"
-                                />
+                                <img src={message.image} alt="Gambar yang dikirim" className="rounded-lg max-w-[200px] border" />
                               </div>
                             )}
 
                             {/* Gambar dari AI */}
                             {message.type === 'ai' && message.image && (
                               <div className="mb-2">
-                                <img
-                                  src={message.image}
-                                  alt="Gambar dari AI"
-                                  className="rounded-lg max-w-[200px] border"
-                                />
-                                <a
-                                  href={message.image}
-                                  target="_blank"
-                                  download="ai-gambar.png"
-                                  className="text-xs text-blue-500 hover:underline block mt-1"
-                                >
+                                <img src={message.image} alt="Gambar dari AI" className="rounded-lg max-w-[200px] border" />
+                                <a href={message.image} target="_blank" download="ai-gambar.png" className="text-xs text-blue-500 hover:underline block mt-1">
                                   ⬇️ Download Gambar
                                 </a>
                               </div>
@@ -261,31 +225,20 @@ const handleOpenFileDialog = () => {
 
                             {/* tampilkan teks */}
                             {message.content && (
-                              <div
-                                className={`whitespace-pre-wrap text-sm leading-relaxed ${
-                                  message.type === 'user' ? 'text-white' : 'text-gray-800 dark:text-gray-200'
-                                }`}
-                              >
+                              <div className={`whitespace-pre-wrap text-sm leading-relaxed ${message.type === 'user' ? 'text-white' : 'text-gray-800 dark:text-gray-200'}`}>
                                 {message.content}
-                                {message.isStreaming && (
-                                  <span className="inline-block w-2 h-4 bg-gray-400 ml-1 animate-pulse"></span>
-                                )}
+                                {message.isStreaming && <span className="inline-block w-2 h-4 bg-gray-400 ml-1 animate-pulse"></span>}
                               </div>
                             )}
 
                             {/* timestamp */}
-                            <div
-                              className={`text-xs mt-2 ${
-                                message.type === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'
-                              }`}
-                            >
+                            <div className={`text-xs mt-2 ${message.type === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
                               {new Date(message.timestamp).toLocaleTimeString('id-ID', {
                                 hour: '2-digit',
                                 minute: '2-digit',
                               })}
                             </div>
                           </div>
-
                         </div>
                       </div>
                     ))}
@@ -295,7 +248,7 @@ const handleOpenFileDialog = () => {
                         <div className="flex space-x-2 max-w-[85%]">
                           <Avatar className="w-8 h-8">
                             <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-                              <Brain className="h-4 w-4" />
+                              <img src="\logo\insanAI-white.png" />
                             </AvatarFallback>
                           </Avatar>
                           <div className="bg-white dark:bg-card border shadow-sm dark:border-gray-700 rounded-lg p-4">
@@ -317,9 +270,7 @@ const handleOpenFileDialog = () => {
 
               <div className="border-t dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800 flex-shrink-0">
                 {/* Info gambar yang dipilih */}
-                  {selectedImage && (
-                    <p className="text-xs text-gray-500 mb-4">📷 Gambar dipilih: {selectedImage.name}</p>
-                  )}
+                {selectedImage && <p className="text-xs text-gray-500 mb-4">📷 Gambar dipilih: {selectedImage.name}</p>}
                 <div className="flex space-x-2">
                   <Input
                     placeholder="Tanyakan apa saja tentang materi, soal, atau analisis kelas..."
@@ -335,30 +286,14 @@ const handleOpenFileDialog = () => {
                     disabled={isTyping}
                   />
                   {/* Input file tersembunyi */}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                    ref={fileInputRef}
-                  />
+                  <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" ref={fileInputRef} />
                   {/* Tombol gambar, buka file dialog via ref */}
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="sm:flex bg-transparent cursor-pointer"
-                    type="button"
-                    onClick={handleOpenFileDialog}
-                  >
+                  <Button size="icon" variant="outline" className="sm:flex bg-transparent cursor-pointer" type="button" onClick={handleOpenFileDialog}>
                     <ImageIcon className="h-4 w-4" />
                   </Button>
 
                   {/* Tombol kirim pesan */}
-                  <Button
-                    onClick={() => handleSendMessage(inputMessage)}
-                    disabled={(!inputMessage.trim() && !selectedImage) || isTyping}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                  >
+                  <Button onClick={() => handleSendMessage(inputMessage)} disabled={(!inputMessage.trim() && !selectedImage) || isTyping} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
