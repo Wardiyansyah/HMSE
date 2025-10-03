@@ -141,7 +141,18 @@ const handleOpenFileDialog = () => {
 
     const res = await fetch('/api/chat-tutor', {
       method: 'POST',
-      body: formData
+      body: ((): FormData => {
+        try {
+          const session = window.localStorage && window.localStorage.getItem('hms_user_session');
+          if (session) {
+            const id = JSON.parse(session).id;
+            formData.append('profileId', id);
+          }
+        } catch (e) {
+          // ignore
+        }
+        return formData;
+      })()
     });
 
     const data = await res.json();

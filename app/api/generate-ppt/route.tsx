@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import PptxGenJS from "pptxgenjs";
+import { addClickPoints } from '@/lib/insanai-points';
 
 // ambil gambar dari DALL·E dan convert ke base64
 async function fetchBase64Image(prompt: string, apiKey: string): Promise<string | null> {
@@ -39,7 +40,7 @@ async function fetchBase64Image(prompt: string, apiKey: string): Promise<string 
 
 export async function POST(req: Request) {
   try {
-    const { content, apiKey, withIllustration } = await req.json();
+    const { content, apiKey, withIllustration, profileId } = await req.json();
     const pptx = new PptxGenJS();
 
     // Cover
@@ -205,6 +206,11 @@ export async function POST(req: Request) {
     });
 
     const buffer = await pptx.write("nodebuffer");
+
+    // Award points for PPT generation
+    if (profileId) {
+      try { await addClickPoints(profileId, 5); } catch (e) { console.error('points error', e); }
+    }
     return new NextResponse(new Uint8Array(buffer), {
       headers: {
         "Content-Type":

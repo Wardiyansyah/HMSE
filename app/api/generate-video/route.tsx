@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { VertexAI } from "@google-cloud/vertexai";
+import { addClickPoints } from '@/lib/insanai-points';
 
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY!,
@@ -16,7 +17,7 @@ function cleanJSONResponse(responseText: string) {
 
 export async function POST(req: Request) {
   try {
-    const { topic, subject, level } = await req.json();
+    const { topic, subject, level, profileId } = await req.json();
 
     // Step 1: Generate script dengan GPT
     const gptRes = await openai.chat.completions.create({
@@ -95,6 +96,11 @@ Aturan:
       null;
 
     // Step 4: Return ke frontend
+    // Award points for video generation
+    if (profileId) {
+      try { await addClickPoints(profileId, 5); } catch (e) { console.error('points error', e); }
+    }
+
     return NextResponse.json({
       script: scriptJson,
       videoUrl,

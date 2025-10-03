@@ -1,4 +1,5 @@
 import { OpenAI } from "openai";
+import { addClickPoints } from '@/lib/insanai-points';
 
 export const runtime = "nodejs";
 
@@ -11,6 +12,7 @@ export async function POST(req: Request) {
     const formData = await req.formData();
     const message = formData.get("message") as string;
     const image = formData.get("image") as File | null;
+    const profileId = (formData.get('profileId') as string) || null;
     const systemContent = `Kamu adalah asisten pembelajaran cerdas untuk siswa Indonesia bernama Insan AI (Intelligent Assistant of Insan Pembangunan). 
           KARAKTERISTIK ANDA:
           - Ramah, sabar, dan mendorong semangat belajar
@@ -55,7 +57,7 @@ export async function POST(req: Request) {
 
     // ==== 1. Kalau ada gambar ====
     if (image) {
-      if (isImprove) {
+  if (isImprove) {
         // --- Step 1: Analisis gambar user ---
         const arrayBuffer = await image.arrayBuffer();
         const base64Image = Buffer.from(arrayBuffer).toString("base64");
@@ -92,6 +94,11 @@ export async function POST(req: Request) {
           size: "auto",
         });
 
+        // award points for image improvement
+        if (profileId) {
+          try { await addClickPoints(profileId, 4); } catch (e) { console.error('points error', e); }
+        }
+
         return new Response(
           JSON.stringify({
             reply: "Ini hasil gambar yang sudah diperbaiki.",
@@ -126,6 +133,11 @@ export async function POST(req: Request) {
           messages,
         });
 
+        // award points for analysis (text response)
+        if (profileId) {
+          try { await addClickPoints(profileId, 2); } catch (e) { console.error('points error', e); }
+        }
+
         return new Response(
           JSON.stringify({ reply: response.choices[0].message.content }),
           { headers: { "Content-Type": "application/json" } }
@@ -140,6 +152,10 @@ export async function POST(req: Request) {
         prompt: message,
         size: "1024x1024",
       });
+      // award points for image generation
+      if (profileId) {
+        try { await addClickPoints(profileId, 3); } catch (e) { console.error('points error', e); }
+      }
 
       return new Response(
         JSON.stringify({
@@ -158,6 +174,10 @@ export async function POST(req: Request) {
         { role: "user", content: message },
       ],
     });
+    // award points for normal chat usage
+    if (profileId) {
+      try { await addClickPoints(profileId, 2); } catch (e) { console.error('points error', e); }
+    }
 
     return new Response(
       JSON.stringify({ reply: response.choices[0].message.content }),

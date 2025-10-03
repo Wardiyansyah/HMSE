@@ -423,10 +423,14 @@ PEDOMAN:
 
   async function generateVideoWithVeo(prompt: string): Promise<string> {
     try {
+      const profileId = (window.localStorage && window.localStorage.getItem('hms_user_session'))
+        ? JSON.parse(window.localStorage.getItem('hms_user_session') as string).id
+        : null;
+
       const res = await fetch("/api/generate-video", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ prompt, profileId }),
       });
       if (!res.ok) throw new Error("Gagal generate video");
       const data = await res.json();
@@ -499,6 +503,7 @@ PEDOMAN:
               content: newContent.content,
               apiKey: apiKey,
               withIllustration,
+              profileId: window.localStorage && window.localStorage.getItem('hms_user_session') ? JSON.parse(window.localStorage.getItem('hms_user_session') as string).id : null,
             }),
           });
 
@@ -930,10 +935,12 @@ PEDOMAN:
                         {content.type === "quiz" && (
                           <Button
                           onClick={async () => {
+                            const profileId = window.localStorage && window.localStorage.getItem('hms_user_session') ? JSON.parse(window.localStorage.getItem('hms_user_session') as string).id : null;
+
                             const res = await fetch("/api/generate-quiz", {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ content: content.content }), // content hasil AI
+                                body: JSON.stringify({ content: content.content, profileId }), // content hasil AI
                               });
                               const blob = await res.blob();
                               const url = window.URL.createObjectURL(blob);

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { jsPDF } from "jspdf";
+import { addClickPoints } from '@/lib/insanai-points';
 
 // Helper untuk tulis teks panjang dengan auto wrap + page break
 function addWrappedText(
@@ -28,7 +29,7 @@ function addWrappedText(
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { content } = body;
+    const { content, profileId } = body;
 
     const doc = new jsPDF();
     let y = 20;
@@ -96,6 +97,11 @@ export async function POST(req: Request) {
     });
 
     const pdfBytes = doc.output("arraybuffer");
+
+    // award points for quiz generation
+    if (profileId) {
+      try { await addClickPoints(profileId, 3); } catch (e) { console.error('points error', e); }
+    }
 
     return new NextResponse(pdfBytes, {
       headers: {
