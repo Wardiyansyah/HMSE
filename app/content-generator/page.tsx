@@ -69,15 +69,15 @@ const contentTypes: ContentType[] = [
     features: ['10-15 Slide', 'Animasi Menarik', 'Template Modern'],
     estimatedTime: '8-10 menit',
   },
-  {
-    id: 'video',
-    title: 'Video Pembelajaran',
-    description: 'Video edukatif hasil generate AI',
-    icon: <Video className="h-6 w-6" />,
-    color: 'from-red-500 to-pink-500',
-    features: ['Video Berkualitas Tinggi', 'Script Terstruktur',],
-    estimatedTime: '3-5 menit',
-  },
+  // {
+  //   id: 'video',
+  //   title: 'Video Pembelajaran',
+  //   description: 'Video edukatif hasil generate AI',
+  //   icon: <Video className="h-6 w-6" />,
+  //   color: 'from-red-500 to-pink-500',
+  //   features: ['Video Berkualitas Tinggi', 'Script Terstruktur',],
+  //   estimatedTime: '3-5 menit',
+  // },
   {
     id: 'quiz',
     title: 'Kuis Interaktif',
@@ -786,7 +786,7 @@ PEDOMAN:
                 <p className="text-gray-600 dark:text-gray-400">Setiap jenis konten memiliki keunggulan dan fitur yang berbeda</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {contentTypes.map((type) => (
                   <Card
                     key={type.id}
